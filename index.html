@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fitory — 잠든 옷장에 이자가 쌓인다</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #1c1610;
+  --bg2: #221a0e;
+  --bg3: #2a2010;
+  --gold: #c9a96e;
+  --gold-l: #e8d5b7;
+  --gold-dim: rgba(201,169,110,0.12);
+  --gold-border: rgba(201,169,110,0.18);
+  --white: #faf7f2;
+  --gray: #8a7f6e;
+  --gray2: rgba(250,247,242,0.55);
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; font-size:16px; }
+body {
+  background:var(--bg);
+  color:var(--white);
+  font-family:'Noto Sans KR', sans-serif;
+  overflow-x:hidden;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+  line-height:1.7;
+}
+
+/* 배경 글로우 */
+body::before {
+  content:'';
+  position:fixed;
+  top:-20%; right:-10%;
+  width:60vw; height:60vw;
+  background:radial-gradient(circle, rgba(201,169,110,0.05) 0%, transparent 65%);
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── NAV ── */
+nav {
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  display:flex; justify-content:space-between; align-items:center;
+  padding:0 clamp(20px,5vw,60px);
+  height:64px;
+  background:rgba(28,22,16,0.92);
+  backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--gold-border);
+}
+.nav-logo {
+  font-family:'Playfair Display', serif;
+  font-size:clamp(1.3rem,2.5vw,1.6rem);
+  font-weight:900;
+  letter-spacing:-0.02em;
+}
+.nav-logo .fi { color:var(--gold); }
+.nav-badge {
+  font-size:clamp(0.65rem,1.2vw,0.72rem);
+  font-weight:500;
+  letter-spacing:0.06em;
+  color:var(--gold);
+  background:rgba(201,169,110,0.1);
+  border:1px solid rgba(201,169,110,0.28);
+  padding:5px 14px;
+  border-radius:20px;
+  white-space:nowrap;
+}
+
+/* ── HERO ── */
+.hero {
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:clamp(32px,5vw,72px);
+  align-items:center;
+  padding:calc(64px + clamp(40px,8vw,80px)) clamp(20px,5vw,60px) clamp(40px,6vw,80px);
+  max-width:1200px;
+  margin:0 auto;
+  position:relative; z-index:1;
+}
+@media(max-width:820px) {
+  .hero { grid-template-columns:1fr; padding-top:calc(64px + 40px); gap:40px; }
+}
+.hero-tag {
+  display:inline-block;
+  font-size:0.68rem; font-weight:500;
+  letter-spacing:0.18em; text-transform:uppercase;
+  color:var(--gold);
+  background:rgba(201,169,110,0.08);
+  border:1px solid rgba(201,169,110,0.22);
+  padding:6px 14px; border-radius:4px;
+  margin-bottom:28px;
+}
+.hero-h1 {
+  font-family:'Playfair Display', serif;
+  font-size:clamp(2.4rem,5.5vw,4.2rem);
+  font-weight:900;
+  line-height:1.1;
+  letter-spacing:-0.02em;
+  margin-bottom:24px;
+}
+.hero-h1 em { font-style:normal; color:var(--gold); display:block; }
+.hero-sub {
+  font-size:clamp(0.9rem,1.6vw,1.05rem);
+  color:var(--gray2);
+  line-height:1.9;
+  font-weight:300;
+}
+.hero-sub strong { color:var(--white); font-weight:500; }
+
+/* ── FORM CARD ── */
+.form-card {
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--gold-border);
+  border-radius:18px;
+  padding:clamp(24px,4vw,36px);
+}
+.form-card-title {
+  font-size:clamp(1rem,1.8vw,1.1rem);
+  font-weight:700; margin-bottom:6px;
+}
+.form-card-sub {
+  font-size:0.82rem; color:var(--gray);
+  margin-bottom:22px; line-height:1.65;
+}
+.field { margin-bottom:11px; }
+.field input, .field textarea, .field select {
+  display:block; width:100%;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(201,169,110,0.2);
+  border-radius:10px;
+  padding:13px 16px;
+  color:var(--white);
+  font-family:'Noto Sans KR', sans-serif;
+  font-size:0.9rem;
+  outline:none;
+  transition:border-color .2s, background .2s;
+  word-break:keep-all;
+}
+.field textarea { resize:vertical; min-height:90px; }
+.field select option { background:var(--bg2); color:var(--white); }
+.field input::placeholder,
+.field textarea::placeholder { color:rgba(250,247,242,0.28); }
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  border-color:rgba(201,169,110,0.5);
+  background:rgba(255,255,255,0.07);
+}
+.consent-row {
+  display:flex; align-items:flex-start;
+  gap:10px; margin:14px 0 18px;
+  cursor:pointer;
+}
+.consent-row input[type="checkbox"] {
+  width:15px; height:15px; min-width:15px;
+  margin-top:3px;
+  accent-color:var(--gold);
+  cursor:pointer;
+}
+.consent-label {
+  font-size:0.73rem; color:var(--gray); line-height:1.65;
+}
+.consent-label a { color:rgba(250,247,242,0.45); text-decoration:underline; }
+
+/* ── BUTTONS ── */
+.btn {
+  display:block; width:100%;
+  background:var(--gold); color:var(--bg);
+  border:none; border-radius:10px;
+  padding:14px 20px;
+  font-family:'Noto Sans KR', sans-serif;
+  font-size:clamp(0.88rem,1.5vw,0.95rem);
+  font-weight:700;
+  cursor:pointer;
+  transition:background .2s, transform .15s;
+  letter-spacing:0.02em;
+  word-break:keep-all;
+  white-space:normal;
+  line-height:1.4;
+  text-align:center;
+}
+.btn:hover { background:#d4b578; transform:translateY(-1px); }
+.btn:active { transform:translateY(0); }
+.btn:disabled { background:rgba(201,169,110,0.35); cursor:not-allowed; transform:none; }
+.btn-outline {
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:8px;
+  background:transparent;
+  color:var(--gold);
+  border:1px solid rgba(201,169,110,0.45);
+  border-radius:10px;
+  padding:13px 28px;
+  font-family:'Noto Sans KR', sans-serif;
+  font-size:clamp(0.88rem,1.5vw,0.95rem);
+  font-weight:500;
+  cursor:pointer;
+  transition:all .2s;
+  word-break:keep-all;
+  white-space:normal;
+  line-height:1.4;
+  text-decoration:none;
+}
+.btn-outline:hover { background:var(--gold-dim); border-color:var(--gold); }
+.btn-filled {
+  display:inline-flex; align-items:center; justify-content:center;
+  gap:8px;
+  background:var(--gold); color:var(--bg);
+  border:none; border-radius:10px;
+  padding:13px 28px;
+  font-family:'Noto Sans KR', sans-serif;
+  font-size:clamp(0.88rem,1.5vw,0.95rem);
+  font-weight:700;
+  cursor:pointer;
+  transition:background .2s, transform .15s;
+  word-break:keep-all;
+  white-space:normal;
+  line-height:1.4;
+  text-decoration:none;
+}
+.btn-filled:hover { background:#d4b578; transform:translateY(-1px); }
+.form-note {
+  font-size:0.7rem; color:var(--gray);
+  margin-top:10px; line-height:1.65;
+}
+.done-msg {
+  display:none; text-align:center;
+  padding:20px 0 8px;
+}
+.done-msg p { font-size:0.9rem; color:var(--gray2); line-height:1.75; }
+
+/* ── SECTIONS ── */
+.sec {
+  padding:clamp(60px,10vw,110px) clamp(20px,5vw,60px);
+  max-width:1200px; margin:0 auto;
+  position:relative; z-index:1;
+}
+.sec-divider { border-top:1px solid var(--gold-border); }
+.sec-label {
+  font-size:0.68rem; font-weight:500;
+  letter-spacing:0.18em; text-transform:uppercase;
+  color:var(--gold); margin-bottom:16px;
+}
+.sec-title {
+  font-family:'Playfair Display', serif;
+  font-size:clamp(1.6rem,3.5vw,2.4rem);
+  font-weight:700; line-height:1.2;
+  margin-bottom:clamp(36px,6vw,60px);
+}
+
+/* ── FEATURE LIST ── */
+.feature-list { display:flex; flex-direction:column; }
+.feature-item {
+  display:grid;
+  grid-template-columns:1fr auto;
+  align-items:start;
+  gap:clamp(16px,3vw,40px);
+  padding:clamp(24px,4vw,36px) 0;
+  border-bottom:1px solid var(--gold-border);
+  transition:background .2s;
+}
+.feature-item:first-child { border-top:1px solid var(--gold-border); }
+.feature-item-left { }
+.feature-item-title {
+  font-family:'Playfair Display', serif;
+  font-size:clamp(1.1rem,2.2vw,1.4rem);
+  font-weight:700; margin-bottom:10px;
+  line-height:1.3;
+}
+.feature-item-desc {
+  font-size:clamp(0.82rem,1.4vw,0.9rem);
+  color:var(--gray); line-height:1.85;
+  max-width:560px;
+}
+.feature-num {
+  font-family:'Playfair Display', serif;
+  font-size:clamp(3rem,7vw,5.5rem);
+  font-weight:900;
+  color:rgba(201,169,110,0.15);
+  line-height:1;
+  text-align:right;
+  min-width:clamp(60px,8vw,100px);
+  padding-top:4px;
+}
+
+/* ── HOW STEPS ── */
+.steps-grid {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:0;
+}
+@media(max-width:700px) {
+  .steps-grid { grid-template-columns:1fr 1fr; }
+}
+@media(max-width:440px) {
+  .steps-grid { grid-template-columns:1fr; }
+}
+.step-item {
+  padding:clamp(20px,3vw,32px) clamp(12px,2vw,24px);
+  border-right:1px solid var(--gold-border);
+  position:relative;
+}
+.step-item:last-child { border-right:none; }
+@media(max-width:700px) {
+  .step-item:nth-child(2) { border-right:none; }
+  .step-item:nth-child(3) { border-right:1px solid var(--gold-border); }
+  .step-item:nth-child(3),
+  .step-item:nth-child(4) { border-top:1px solid var(--gold-border); }
+}
+@media(max-width:440px) {
+  .step-item { border-right:none; border-bottom:1px solid var(--gold-border); }
+  .step-item:last-child { border-bottom:none; }
+}
+.step-num {
+  font-family:'Playfair Display', serif;
+  font-size:clamp(2.5rem,5vw,4rem);
+  font-weight:900;
+  color:rgba(201,169,110,0.14);
+  line-height:1; margin-bottom:12px;
+  text-align:right;
+}
+.step-line {
+  width:100%; height:1px;
+  background:rgba(201,169,110,0.2);
+  margin-bottom:14px;
+}
+.step-title {
+  font-size:clamp(0.85rem,1.5vw,0.95rem);
+  font-weight:700; margin-bottom:6px;
+  line-height:1.4;
+}
+.step-desc {
+  font-size:clamp(0.75rem,1.2vw,0.82rem);
+  color:var(--gray); line-height:1.7;
+}
+
+/* ── PARTNERSHIP ── */
+.partner-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:clamp(32px,5vw,64px);
+  align-items:start;
+}
+@media(max-width:820px) { .partner-grid { grid-template-columns:1fr; } }
+.partner-title {
+  font-family:'Playfair Display', serif;
+  font-size:clamp(1.4rem,3vw,2rem);
+  font-weight:700; line-height:1.25;
+  margin-bottom:14px;
+}
+.partner-desc {
+  font-size:clamp(0.82rem,1.4vw,0.9rem);
+  color:var(--gray); line-height:1.85;
+  margin-bottom:24px;
+}
+.ptype-list { display:flex; flex-direction:column; gap:10px; margin-bottom:22px; }
+.ptype-item {
+  background:rgba(201,169,110,0.04);
+  border:1px solid var(--gold-border);
+  border-radius:10px;
+  padding:13px 16px;
+  transition:border-color .2s;
+}
+.ptype-item:hover { border-color:rgba(201,169,110,0.35); }
+.ptype-title {
+  font-size:clamp(0.85rem,1.4vw,0.9rem);
+  font-weight:700; margin-bottom:3px;
+}
+.ptype-desc {
+  font-size:clamp(0.75rem,1.2vw,0.8rem);
+  color:var(--gray);
+}
+.email-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(201,169,110,0.08);
+  border:1px solid rgba(201,169,110,0.25);
+  border-radius:8px; padding:10px 16px;
+  font-size:clamp(0.78rem,1.3vw,0.85rem);
+  color:var(--gold);
+}
+
+/* ── SNS ── */
+.sns-sec {
+  background:rgba(255,255,255,0.015);
+  border-top:1px solid var(--gold-border);
+  border-bottom:1px solid var(--gold-border);
+  padding:clamp(60px,10vw,110px) clamp(20px,5vw,60px);
+  position:relative; z-index:1;
+}
+.sns-inner {
+  max-width:620px; margin:0 auto; text-align:center;
+}
+.sns-title {
+  font-family:'Playfair Display', serif;
+  font-size:clamp(1.4rem,3vw,2rem);
+  font-weight:700; line-height:1.3;
+  margin-bottom:12px;
+}
+.sns-sub {
+  font-size:clamp(0.85rem,1.5vw,0.95rem);
+  color:var(--gray2); line-height:1.8;
+  margin-bottom:24px;
+}
+.sns-handle {
+  display:block;
+  font-family:'Playfair Display', serif;
+  font-size:clamp(1.2rem,2.5vw,1.6rem);
+  font-weight:700; color:var(--gold);
+  letter-spacing:0.02em; margin-bottom:28px;
+}
+.sns-btns {
+  display:flex; gap:14px;
+  justify-content:center; flex-wrap:wrap;
+}
+
+/* ── FOOTER ── */
+footer {
+  padding:clamp(28px,4vw,40px) clamp(20px,5vw,60px);
+  display:flex; justify-content:space-between;
+  align-items:center; flex-wrap:wrap; gap:20px;
+  position:relative; z-index:1;
+  border-top:1px solid var(--gold-border);
+}
+.footer-logo {
+  font-family:'Playfair Display', serif;
+  font-size:clamp(1.1rem,2vw,1.3rem);
+  font-weight:900;
+}
+.footer-logo .fi { color:var(--gold); }
+.footer-txt {
+  font-size:clamp(0.68rem,1.1vw,0.75rem);
+  color:var(--gray); line-height:1.9;
+  max-width:500px;
+}
+.footer-txt a { color:var(--gray); text-decoration:underline; }
+
+/* ── MODAL ── */
+.modal-bg {
+  display:none; position:fixed; inset:0;
+  background:rgba(0,0,0,0.75); z-index:300;
+  align-items:center; justify-content:center; padding:20px;
+}
+.modal-bg.on { display:flex; }
+.modal {
+  background:var(--bg2); border:1px solid var(--gold-border);
+  border-radius:16px; padding:clamp(24px,4vw,32px);
+  max-width:460px; width:100%;
+}
+.modal h3 { font-size:1.05rem; margin-bottom:14px; font-weight:700; }
+.modal p { font-size:0.8rem; color:var(--gray); line-height:1.8; margin-bottom:8px; }
+.modal-close {
+  margin-top:18px; background:rgba(255,255,255,0.07);
+  border:none; color:white; padding:9px 22px;
+  border-radius:8px; cursor:pointer;
+  font-family:'Noto Sans KR', sans-serif; font-size:0.83rem;
+}
+
+/* ── ANIMATIONS ── */
+.fade-up {
+  opacity:0; transform:translateY(20px);
+  transition:opacity .6s ease, transform .6s ease;
+}
+.fade-up.visible { opacity:1; transform:translateY(0); }
+
+/* ── SVG ICONS ── */
+.icon-ig { display:inline-block; width:18px; height:18px; vertical-align:middle; }
+.icon-th { display:inline-block; width:18px; height:18px; vertical-align:middle; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><span class="fi">Fi</span>tory</div>
+  <div class="nav-badge">사전 오픈 신청 중</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div>
+    <div class="hero-tag">Coming Soon · 2026</div>
+    <h1 class="hero-h1">
+      잠든 옷장에<br>
+      <em>이자가 쌓인다</em>
+    </h1>
+    <p class="hero-sub">
+      동네 거점에서 <strong>3분 만에 픽업.</strong><br>
+      정찰제로 투명하게, <strong>3,000원부터.</strong><br>
+      출퇴근길에 빌리고, 반납하고, 수익을 만드세요.
+    </p>
+  </div>
+
+  <div class="form-card">
+    <div class="form-card-title">사전 오픈 신청</div>
+    <div class="form-card-sub">오픈 시 가장 먼저 알려드립니다.<br>신청자에게 오픈 초기 혜택이 제공될 예정이에요.</div>
+    <div id="fa1">
+      <div class="field"><input type="text" id="n1" placeholder="이름 또는 닉네임" maxlength="20"></div>
+      <div class="field"><input type="tel" id="p1" placeholder="010-0000-0000" maxlength="13"></div>
+      <label class="consent-row">
+        <input type="checkbox" id="c1">
+        <span class="consent-label">개인정보 수집·이용에 동의합니다. 수집: 이름·연락처 / 목적: 오픈 안내 / 보유: 오픈 후 즉시 파기. <a href="#" onclick="openM(event)">자세히</a></span>
+      </label>
+      <button class="btn" type="button" onclick="doSignup(this)">오픈 알림 신청하기</button>
+      <p class="form-note">* 현재 개발 중인 서비스입니다. 개인정보는 오픈 안내 외 사용되지 않습니다.</p>
+    </div>
+    <div class="done-msg" id="ok1"><p><strong>신청 완료! 🎉</strong><br>Fitory 오픈 시 가장 먼저 연락드릴게요 😊</p></div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="sec sec-divider">
+  <div class="sec-label">Why Fitory</div>
+  <h2 class="sec-title">기존 대안이 해결 못한<br>세 가지를 동시에</h2>
+  <div class="feature-list">
+    <div class="feature-item fade-up">
+      <div class="feature-item-left">
+        <div class="feature-item-title">3분 만에, 오늘 바로</div>
+        <div class="feature-item-desc">배송은 내일이에요. Fitory는 출퇴근길 동네 거점에서 QR 하나로 지금 당장 픽업. 오늘 입을 옷을 오늘 빌리세요.</div>
+      </div>
+      <div class="feature-num">01</div>
+    </div>
+    <div class="feature-item fade-up">
+      <div class="feature-item-left">
+        <div class="feature-item-title">3,000원부터, 정찰제</div>
+        <div class="feature-item-desc">최저가 3,000원. 카테고리별 정찰제로 투명하게. 일반 의류는 수수료 없어요. 공급자 대여료 전액 지급. 고가·명품 일부 카테고리만 수수료 적용.</div>
+      </div>
+      <div class="feature-num">02</div>
+    </div>
+    <div class="feature-item fade-up">
+      <div class="feature-item-left">
+        <div class="feature-item-title">잠든 옷이 돈이 된다</div>
+        <div class="feature-item-desc">옷장을 등록하면 대여료가 쌓여요. 내 옷이 일하게 만드세요. 캐리어도 곧 됩니다.</div>
+      </div>
+      <div class="feature-num">03</div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW -->
+<section class="sec sec-divider">
+  <div class="sec-label">How it works</div>
+  <h2 class="sec-title">딱 4단계예요</h2>
+  <div class="steps-grid">
+    <div class="step-item fade-up">
+      <div class="step-num">01</div>
+      <div class="step-line"></div>
+      <div class="step-title">앱에서 옷 선택</div>
+      <div class="step-desc">AI 코디 추천도 받아보세요.</div>
+    </div>
+    <div class="step-item fade-up">
+      <div class="step-num">02</div>
+      <div class="step-line"></div>
+      <div class="step-title">보관함 QR 픽업</div>
+      <div class="step-desc">출근길, 3분이면 충분.</div>
+    </div>
+    <div class="step-item fade-up">
+      <div class="step-num">03</div>
+      <div class="step-line"></div>
+      <div class="step-title">오늘의 코디 완성</div>
+      <div class="step-desc">원하는 스타일로, 3,000원부터.</div>
+    </div>
+    <div class="step-item fade-up">
+      <div class="step-num">04</div>
+      <div class="step-line"></div>
+      <div class="step-title">사진 찍고 반납</div>
+      <div class="step-desc">포인트 적립까지.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PARTNERSHIP -->
+<section class="sec sec-divider">
+  <div class="sec-label">Partnership</div>
+  <div class="partner-grid">
+    <div>
+      <h2 class="partner-title">함께 만들어갈<br>파트너를 찾습니다</h2>
+      <p class="partner-desc">Fitory는 거점 공간, 보관함 제작, 의류 공급, 투자 등 다양한 형태의 협력에 열려 있습니다.</p>
+      <div class="ptype-list">
+        <div class="ptype-item fade-up">
+          <div class="ptype-title">거점 공간 제공</div>
+          <div class="ptype-desc">코인세탁방, 무인카페, 아파트 등</div>
+        </div>
+        <div class="ptype-item fade-up">
+          <div class="ptype-title">의류 소매업체 입점</div>
+          <div class="ptype-desc">구제샵·편집샵·소규모 브랜드</div>
+        </div>
+        <div class="ptype-item fade-up">
+          <div class="ptype-title">보관함 제작·공급</div>
+          <div class="ptype-desc">IoT 스마트 보관함 제조사</div>
+        </div>
+        <div class="ptype-item fade-up">
+          <div class="ptype-title">투자 및 사업 협력</div>
+          <div class="ptype-desc">엔젤·액셀러레이터·멘토링 환영</div>
+        </div>
+      </div>
+      <div class="email-badge">dudn4291@naver.com</div>
+    </div>
+
+    <div class="form-card fade-up">
+      <div class="form-card-title">파트너십 문의</div>
+      <div class="form-card-sub">아래 양식으로 보내주시면 빠르게 답변드릴게요.</div>
+      <div id="fa2">
+        <div class="field"><input type="text" id="n2" placeholder="이름 / 회사명" maxlength="40"></div>
+        <div class="field"><input type="tel" id="p2" placeholder="010-0000-0000" maxlength="13"></div>
+        <div class="field">
+          <select id="t2">
+            <option value="" disabled selected>문의 유형 선택</option>
+            <option>거점 공간 제공</option>
+            <option>의류 소매업체 입점</option>
+            <option>보관함 제작·공급</option>
+            <option>투자 및 사업 협력</option>
+            <option>기타</option>
+          </select>
+        </div>
+        <div class="field"><textarea id="m2" placeholder="문의 내용을 자유롭게 적어주세요."></textarea></div>
+        <button class="btn" type="button" onclick="doPartner(this)">문의 보내기</button>
+        <p class="form-note">* 입력하신 정보는 파트너십 문의 답변 목적으로만 사용됩니다.</p>
+      </div>
+      <div class="done-msg" id="ok2"><p><strong>문의 감사합니다! ✅</strong><br>빠른 시일 내에 답변드릴게요.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SNS -->
+<div class="sns-sec">
+  <div class="sns-inner">
+    <div class="sec-label" style="text-align:center;">Follow us</div>
+    <h2 class="sns-title">Fitory가 세상을 바꾸는 과정,<br>인스타그램에서 가장 먼저 확인하세요</h2>
+    <p class="sns-sub">창업 스토리부터 서비스 오픈까지.<br>모든 순간을 함께하고 싶어요.</p>
+    <span class="sns-handle">@Fitory__official__</span>
+    <div class="sns-btns">
+      <a href="https://www.instagram.com/" target="_blank" class="btn-filled">
+        <svg class="icon-ig" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="20" height="20" rx="5" stroke="#1c1610" stroke-width="2"/>
+          <circle cx="12" cy="12" r="4" stroke="#1c1610" stroke-width="2"/>
+          <circle cx="17.5" cy="6.5" r="1" fill="#1c1610"/>
+        </svg>
+        인스타그램 팔로우
+      </a>
+      <a href="https://www.threads.net/" target="_blank" class="btn-outline">
+        <svg class="icon-th" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.5 8.5c-.5-2.5-3.5-3-5-1.5-1 1-1 3 0 4s3 1.5 4 0" stroke="#c9a96e" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M12 8v8M9.5 13.5c.8 1.5 2.5 2 4 1.5" stroke="#c9a96e" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+        Threads 팔로우
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo"><span class="fi">Fi</span>tory</div>
+  <div class="footer-txt">
+    © 2026 Fitory. 현재 개발 중인 서비스입니다.<br>
+    개인정보: 수집(이름·연락처) / 목적(오픈안내·파트너십 문의) / 보유(목적달성 후 즉시파기) / 제3자 제공 없음<br>
+    <a href="mailto:dudn4291@naver.com">dudn4291@naver.com</a>
+  </div>
+</footer>
+
+<!-- 개인정보 모달 -->
+<div class="modal-bg" id="mb">
+  <div class="modal">
+    <h3>개인정보 수집·이용 안내</h3>
+    <p><strong>수집 항목:</strong> 이름(닉네임), 연락처</p>
+    <p><strong>수집 목적:</strong> 서비스 오픈 안내 및 초기 혜택 제공</p>
+    <p><strong>보유 기간:</strong> 오픈 안내 완료 후 즉시 파기</p>
+    <p><strong>제3자 제공:</strong> 없음</p>
+    <p style="font-size:0.73rem;color:rgba(138,127,110,0.65)">본 서비스는 현재 개발 중이며 출시 일정은 변경될 수 있습니다.</p>
+    <button class="modal-close" onclick="closeM()">확인</button>
+  </div>
+</div>
+
+<script>
+// 모달
+function openM(e){e.preventDefault();document.getElementById('mb').classList.add('on');}
+function closeM(){document.getElementById('mb').classList.remove('on');}
+document.getElementById('mb').addEventListener('click',function(e){if(e.target===this)closeM();});
+
+// 전화번호 포맷
+function fmtPhone(el){
+  let v=el.value.replace(/\D/g,'');
+  if(v.length>=7) v=v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7,11);
+  else if(v.length>=4) v=v.slice(0,3)+'-'+v.slice(3);
+  el.value=v;
+}
+document.getElementById('p1').addEventListener('input',function(){fmtPhone(this);});
+document.getElementById('p2').addEventListener('input',function(){fmtPhone(this);});
+
+// 사전 신청
+async function doSignup(btn){
+  const n=document.getElementById('n1').value.trim();
+  const p=document.getElementById('p1').value.trim();
+  const c=document.getElementById('c1').checked;
+  if(!n){alert('이름을 입력해주세요.');return;}
+  if(p.replace(/\D/g,'').length<10){alert('연락처를 올바르게 입력해주세요.');return;}
+  if(!c){alert('개인정보 수집·이용에 동의해주세요.');return;}
+  btn.disabled=true; btn.textContent='신청 중...';
+  try{
+    const r=await fetch('https://formspree.io/f/xreyrkzn',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({이름:n,연락처:p,유형:'사전오픈신청'})
+    });
+    if(r.ok){
+      document.getElementById('fa1').style.display='none';
+      document.getElementById('ok1').style.display='block';
+    } else {
+      alert('오류가 발생했습니다. 다시 시도해주세요.');
+      btn.disabled=false; btn.textContent='오픈 알림 신청하기';
+    }
+  } catch(e){
+    alert('네트워크 오류입니다. 다시 시도해주세요.');
+    btn.disabled=false; btn.textContent='오픈 알림 신청하기';
+  }
+}
+
+// 파트너십 문의
+async function doPartner(btn){
+  const n=document.getElementById('n2').value.trim();
+  const p=document.getElementById('p2').value.trim();
+  const t=document.getElementById('t2').value;
+  const m=document.getElementById('m2').value.trim();
+  if(!n){alert('이름 또는 회사명을 입력해주세요.');return;}
+  if(p.replace(/\D/g,'').length<10){alert('연락처를 올바르게 입력해주세요.');return;}
+  if(!t){alert('문의 유형을 선택해주세요.');return;}
+  if(!m){alert('문의 내용을 입력해주세요.');return;}
+  btn.disabled=true; btn.textContent='전송 중...';
+  try{
+    const r=await fetch('https://formspree.io/f/xreyrkzn',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Accept':'application/json'},
+      body:JSON.stringify({이름:n,연락처:p,문의유형:t,내용:m,유형:'파트너십문의'})
+    });
+    if(r.ok){
+      document.getElementById('fa2').style.display='none';
+      document.getElementById('ok2').style.display='block';
+    } else {
+      alert('오류가 발생했습니다. 다시 시도해주세요.');
+      btn.disabled=false; btn.textContent='문의 보내기';
+    }
+  } catch(e){
+    alert('네트워크 오류입니다. 다시 시도해주세요.');
+    btn.disabled=false; btn.textContent='문의 보내기';
+  }
+}
+
+// 스크롤 애니메이션
+const obs=new IntersectionObserver(es=>{
+  es.forEach(e=>{if(e.isIntersecting) e.target.classList.add('visible');});
+},{threshold:0.08});
+document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
