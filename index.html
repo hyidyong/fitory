@@ -4,815 +4,449 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fitory — 잠든 옷장에 이자가 쌓인다</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Noto+Serif+KR:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<meta name="description" content="AI가 코디를 추천하고, 동네 매장에서 오늘 바로. Fitory는 소유에서 경험으로, 패션 소비의 새로운 표준을 만듭니다.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #1c1610;
-  --bg2: #221a0e;
-  --bg3: #2a2010;
-  --gold: #c9a96e;
-  --gold-l: #e8d5b7;
-  --gold-dim: rgba(201,169,110,0.12);
-  --gold-border: rgba(201,169,110,0.18);
-  --white: #faf7f2;
-  --gray: #8a7f6e;
-  --gray2: rgba(250,247,242,0.55);
-}
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior:smooth; font-size:16px; }
-body {
-  background:var(--bg);
-  color:var(--white);
-  font-family:'Noto Sans KR', sans-serif;
-  overflow-x:hidden;
-  word-break:keep-all;
-  overflow-wrap:break-word;
-  line-height:1.7;
-}
-
-/* 배경 글로우 */
-body::before {
-  content:'';
-  position:fixed;
-  top:-20%; right:-10%;
-  width:60vw; height:60vw;
-  background:radial-gradient(circle, rgba(201,169,110,0.05) 0%, transparent 65%);
-  pointer-events:none;
-  z-index:0;
-}
-
-/* ── NAV ── */
-nav {
-  position:fixed; top:0; left:0; right:0; z-index:200;
-  display:flex; justify-content:space-between; align-items:center;
-  padding:0 clamp(20px,5vw,60px);
-  height:64px;
-  background:rgba(28,22,16,0.92);
-  backdrop-filter:blur(16px);
-  border-bottom:1px solid var(--gold-border);
-}
-.nav-logo {
-  font-family:'Playfair Display', serif;
-  font-size:clamp(1.3rem,2.5vw,1.6rem);
-  font-weight:900;
-  letter-spacing:-0.02em;
-}
-.nav-logo .fi { color:var(--gold); }
-.nav-badge {
-  font-size:clamp(0.65rem,1.2vw,0.72rem);
-  font-weight:500;
-  letter-spacing:0.06em;
-  color:var(--gold);
-  background:rgba(201,169,110,0.1);
-  border:1px solid rgba(201,169,110,0.28);
-  padding:5px 14px;
-  border-radius:20px;
-  white-space:nowrap;
-}
-
-/* ── HERO ── */
-.hero {
-  min-height:100vh;
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:clamp(32px,5vw,72px);
-  align-items:center;
-  padding:calc(64px + clamp(40px,8vw,80px)) clamp(20px,5vw,60px) clamp(40px,6vw,80px);
-  max-width:1200px;
-  margin:0 auto;
-  position:relative; z-index:1;
-}
-@media(max-width:820px) {
-  .hero { grid-template-columns:1fr; padding-top:calc(64px + 40px); gap:40px; }
-}
-.hero-tag {
-  display:inline-block;
-  font-size:0.68rem; font-weight:500;
-  letter-spacing:0.18em; text-transform:uppercase;
-  color:var(--gold);
-  background:rgba(201,169,110,0.08);
-  border:1px solid rgba(201,169,110,0.22);
-  padding:6px 14px; border-radius:4px;
-  margin-bottom:28px;
-}
-.hero-h1 {
-  font-family:'Playfair Display', serif;
-  font-size:clamp(2.4rem,5.5vw,4.2rem);
-  font-weight:900;
-  line-height:1.1;
-  letter-spacing:-0.02em;
-  margin-bottom:24px;
-}
-.hero-h1 em { font-style:normal; color:var(--gold); display:block; }
-.hero-sub {
-  font-size:clamp(0.9rem,1.6vw,1.05rem);
-  color:var(--gray2);
-  line-height:1.9;
-  font-weight:300;
-}
-.hero-sub strong { color:var(--white); font-weight:500; }
-
-/* ── FORM CARD ── */
-.form-card {
-  background:rgba(255,255,255,0.03);
-  border:1px solid var(--gold-border);
-  border-radius:18px;
-  padding:clamp(24px,4vw,36px);
-}
-.form-card-title {
-  font-size:clamp(1rem,1.8vw,1.1rem);
-  font-weight:700; margin-bottom:6px;
-}
-.form-card-sub {
-  font-size:0.82rem; color:var(--gray);
-  margin-bottom:22px; line-height:1.65;
-}
-.field { margin-bottom:11px; }
-.field input, .field textarea, .field select {
-  display:block; width:100%;
-  background:rgba(255,255,255,0.05);
-  border:1px solid rgba(201,169,110,0.2);
-  border-radius:10px;
-  padding:13px 16px;
-  color:var(--white);
-  font-family:'Noto Sans KR', sans-serif;
-  font-size:0.9rem;
-  outline:none;
-  transition:border-color .2s, background .2s;
-  word-break:keep-all;
-}
-.field textarea { resize:vertical; min-height:90px; }
-.field select option { background:var(--bg2); color:var(--white); }
-.field input::placeholder,
-.field textarea::placeholder { color:rgba(250,247,242,0.28); }
-.field input:focus,
-.field textarea:focus,
-.field select:focus {
-  border-color:rgba(201,169,110,0.5);
-  background:rgba(255,255,255,0.07);
-}
-.consent-row {
-  display:flex; align-items:flex-start;
-  gap:10px; margin:14px 0 18px;
-  cursor:pointer;
-}
-.consent-row input[type="checkbox"] {
-  width:15px; height:15px; min-width:15px;
-  margin-top:3px;
-  accent-color:var(--gold);
-  cursor:pointer;
-}
-.consent-label {
-  font-size:0.73rem; color:var(--gray); line-height:1.65;
-}
-.consent-label a { color:rgba(250,247,242,0.45); text-decoration:underline; }
-
-/* ── BUTTONS ── */
-.btn {
-  display:block; width:100%;
-  background:var(--gold); color:var(--bg);
-  border:none; border-radius:10px;
-  padding:14px 20px;
-  font-family:'Noto Sans KR', sans-serif;
-  font-size:clamp(0.88rem,1.5vw,0.95rem);
-  font-weight:700;
-  cursor:pointer;
-  transition:background .2s, transform .15s;
-  letter-spacing:0.02em;
-  word-break:keep-all;
-  white-space:normal;
-  line-height:1.4;
-  text-align:center;
-}
-.btn:hover { background:#d4b578; transform:translateY(-1px); }
-.btn:active { transform:translateY(0); }
-.btn:disabled { background:rgba(201,169,110,0.35); cursor:not-allowed; transform:none; }
-.btn-outline {
-  display:inline-flex; align-items:center; justify-content:center;
-  gap:8px;
-  background:transparent;
-  color:var(--gold);
-  border:1px solid rgba(201,169,110,0.45);
-  border-radius:10px;
-  padding:13px 28px;
-  font-family:'Noto Sans KR', sans-serif;
-  font-size:clamp(0.88rem,1.5vw,0.95rem);
-  font-weight:500;
-  cursor:pointer;
-  transition:all .2s;
-  word-break:keep-all;
-  white-space:normal;
-  line-height:1.4;
-  text-decoration:none;
-}
-.btn-outline:hover { background:var(--gold-dim); border-color:var(--gold); }
-.btn-filled {
-  display:inline-flex; align-items:center; justify-content:center;
-  gap:8px;
-  background:var(--gold); color:var(--bg);
-  border:none; border-radius:10px;
-  padding:13px 28px;
-  font-family:'Noto Sans KR', sans-serif;
-  font-size:clamp(0.88rem,1.5vw,0.95rem);
-  font-weight:700;
-  cursor:pointer;
-  transition:background .2s, transform .15s;
-  word-break:keep-all;
-  white-space:normal;
-  line-height:1.4;
-  text-decoration:none;
-}
-.btn-filled:hover { background:#d4b578; transform:translateY(-1px); }
-.form-note {
-  font-size:0.7rem; color:var(--gray);
-  margin-top:10px; line-height:1.65;
-}
-.done-msg {
-  display:none; text-align:center;
-  padding:20px 0 8px;
-}
-.done-msg p { font-size:0.9rem; color:var(--gray2); line-height:1.75; }
-
-/* ── SECTIONS ── */
-.sec {
-  padding:clamp(60px,10vw,110px) clamp(20px,5vw,60px);
-  max-width:1200px; margin:0 auto;
-  position:relative; z-index:1;
-}
-.sec-divider { border-top:1px solid var(--gold-border); }
-.sec-label {
-  font-size:0.68rem; font-weight:500;
-  letter-spacing:0.18em; text-transform:uppercase;
-  color:var(--gold); margin-bottom:16px;
-}
-.sec-title {
-  font-family:'Playfair Display', serif;
-  font-size:clamp(1.6rem,3.5vw,2.4rem);
-  font-weight:700; line-height:1.2;
-  margin-bottom:clamp(36px,6vw,60px);
-}
-
-/* ── FEATURE LIST ── */
-.feature-list { display:flex; flex-direction:column; }
-.feature-item {
-  display:grid;
-  grid-template-columns:1fr auto;
-  align-items:start;
-  gap:clamp(16px,3vw,40px);
-  padding:clamp(24px,4vw,36px) 0;
-  border-bottom:1px solid var(--gold-border);
-  transition:background .2s;
-}
-.feature-item:first-child { border-top:1px solid var(--gold-border); }
-.feature-item-left { }
-.feature-item-title {
-  font-family:'Playfair Display', serif;
-  font-size:clamp(1.1rem,2.2vw,1.4rem);
-  font-weight:700; margin-bottom:10px;
-  line-height:1.3;
-}
-.feature-item-desc {
-  font-size:clamp(0.82rem,1.4vw,0.9rem);
-  color:var(--gray); line-height:1.85;
-  max-width:560px;
-}
-.feature-num {
-  font-family:'Playfair Display', serif;
-  font-size:clamp(3rem,7vw,5.5rem);
-  font-weight:900;
-  color:rgba(201,169,110,0.15);
-  line-height:1;
-  text-align:right;
-  min-width:clamp(60px,8vw,100px);
-  padding-top:4px;
-}
+:root{--bg:#191410;--bg2:#1f1810;--bg4:#111009;--gold:#c9a96e;--gold-h:#d9be8e;--gdim:rgba(201,169,110,.10);--gbord:rgba(201,169,110,.18);--white:#faf7f2;--gray:#8a7f6e;--gray2:rgba(250,247,242,.52);--gray3:rgba(250,247,242,.26);--ab:#4fc3f7;--ag:#81c784;--serif:'Playfair Display',Georgia,serif;--sans:'Noto Sans KR',-apple-system,sans-serif;--r:13px;--rl:20px;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg4);color:var(--white);font-family:var(--sans);overflow-x:hidden;word-break:keep-all;overflow-wrap:break-word;line-height:1.7;-webkit-font-smoothing:antialiased;}
+.glow-r{position:fixed;top:-25%;right:-15%;width:65vw;height:65vw;pointer-events:none;z-index:0;background:radial-gradient(circle,rgba(201,169,110,.042) 0%,transparent 65%);}
+.glow-l{position:fixed;bottom:-20%;left:-10%;width:50vw;height:50vw;pointer-events:none;z-index:0;background:radial-gradient(circle,rgba(79,195,247,.02) 0%,transparent 65%);}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(20px,5vw,64px);height:64px;background:rgba(14,11,7,.9);backdrop-filter:blur(24px);border-bottom:1px solid var(--gbord);}
+.nav-logo{font-family:var(--serif);font-size:clamp(1.25rem,2.2vw,1.5rem);font-weight:900;letter-spacing:-.03em;color:var(--white);}
+.nav-logo .fi{color:var(--gold);}
+.nav-r{display:flex;align-items:center;gap:12px;}
+.nav-pill{font-size:clamp(.6rem,1vw,.68rem);font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);background:rgba(201,169,110,.07);border:1px solid rgba(201,169,110,.22);padding:5px 13px;border-radius:20px;white-space:nowrap;}
 
 
-/* ── HOW STEPS ── */
-.steps-grid {
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:0;
-}
-@media(max-width:700px) {
-  .steps-grid { grid-template-columns:1fr 1fr; }
-}
-@media(max-width:440px) {
-  .steps-grid { grid-template-columns:1fr; }
-}
-.step-item {
-  padding:clamp(20px,3vw,32px) clamp(12px,2vw,24px);
-  border-right:1px solid var(--gold-border);
-  position:relative;
-}
-.step-item:last-child { border-right:none; }
-@media(max-width:700px) {
-  .step-item:nth-child(2) { border-right:none; }
-  .step-item:nth-child(3) { border-right:1px solid var(--gold-border); }
-  .step-item:nth-child(3),
-  .step-item:nth-child(4) { border-top:1px solid var(--gold-border); }
-}
-@media(max-width:440px) {
-  .step-item { border-right:none; border-bottom:1px solid var(--gold-border); }
-  .step-item:last-child { border-bottom:none; }
-}
-.step-num {
-  font-family:'Playfair Display', serif;
-  font-size:clamp(2.5rem,5vw,4rem);
-  font-weight:900;
-  color:rgba(201,169,110,0.14);
-  line-height:1; margin-bottom:12px;
-  text-align:right;
-}
-.step-line {
-  width:100%; height:1px;
-  background:rgba(201,169,110,0.2);
-  margin-bottom:14px;
-}
-.step-title {
-  font-size:clamp(0.85rem,1.5vw,0.95rem);
-  font-weight:700; margin-bottom:6px;
-  line-height:1.4;
-}
-.step-desc {
-  font-size:clamp(0.75rem,1.2vw,0.82rem);
-  color:var(--gray); line-height:1.7;
-}
+@media(max-width:500px){.nav-pill{display:none;}}
+.sec-inner{max-width:1200px;margin:0 auto;padding:0 clamp(20px,5vw,64px);position:relative;z-index:1;}
+.sec{padding:clamp(72px,11vw,116px) 0;position:relative;z-index:1;}
+.divider{border-top:1px solid var(--gbord);}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:.64rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);background:rgba(201,169,110,.07);border:1px solid rgba(201,169,110,.2);padding:5px 13px;border-radius:4px;margin-bottom:24px;}
+.ed{width:5px;height:5px;border-radius:50%;background:var(--gold);animation:blink 2s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.22}}
+.sec-h2{font-family:var(--serif);font-size:clamp(1.7rem,3.5vw,2.55rem);font-weight:700;line-height:1.18;letter-spacing:-.025em;margin-bottom:clamp(40px,6vw,64px);}
+.sec-h2 em{font-style:normal;color:var(--gold);}
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,88px);align-items:center;padding:calc(64px + clamp(52px,9vw,100px)) clamp(20px,5vw,64px) clamp(52px,8vw,100px);max-width:1200px;margin:0 auto;position:relative;z-index:1;}
+@media(max-width:860px){.hero{grid-template-columns:1fr;padding-top:calc(64px + 48px);gap:48px;}}
+.hero-h1{font-family:var(--serif);font-size:clamp(2.3rem,5.2vw,4rem);font-weight:900;line-height:1.07;letter-spacing:-.03em;margin-bottom:28px;}
+.hero-h1 .g{color:var(--gold);}
+.hero-h1 .sub{display:block;font-size:clamp(.95rem,1.7vw,1.25rem);font-weight:300;font-style:italic;color:var(--gray3);margin-top:14px;letter-spacing:.01em;line-height:1.6;}
+.hero-body{font-size:clamp(.88rem,1.45vw,1rem);color:var(--gray2);line-height:2.05;font-weight:300;margin-bottom:16px;}
+.hero-body strong{color:var(--white);font-weight:600;}
+.hero-proof{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.proof-item{display:flex;flex-direction:column;gap:4px;padding:18px 22px;background:rgba(201,169,110,.04);border:1px solid var(--gbord);border-radius:var(--r);}
+.proof-num{font-family:var(--serif);font-size:clamp(1.8rem,3.2vw,2.5rem);font-weight:900;color:var(--gold);line-height:1;letter-spacing:-.04em;}
+.proof-label{font-size:.7rem;color:var(--gray);font-weight:400;letter-spacing:.02em;}
 
-/* ── PARTNERSHIP ── */
-.partner-grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:clamp(32px,5vw,64px);
-  align-items:start;
-}
-@media(max-width:820px) { .partner-grid { grid-template-columns:1fr; } }
-.partner-title {
-  font-family:'Playfair Display', serif;
-  font-size:clamp(1.4rem,3vw,2rem);
-  font-weight:700; line-height:1.25;
-  margin-bottom:14px;
-}
-.partner-desc {
-  font-size:clamp(0.82rem,1.4vw,0.9rem);
-  color:var(--gray); line-height:1.85;
-  margin-bottom:24px;
-}
-.ptype-list { display:flex; flex-direction:column; gap:10px; margin-bottom:22px; }
-.ptype-item {
-  background:rgba(201,169,110,0.04);
-  border:1px solid var(--gold-border);
-  border-radius:10px;
-  padding:13px 16px;
-  transition:border-color .2s;
-}
-.ptype-item:hover { border-color:rgba(201,169,110,0.35); }
-.ptype-title {
-  font-size:clamp(0.85rem,1.4vw,0.9rem);
-  font-weight:700; margin-bottom:3px;
-}
-.ptype-desc {
-  font-size:clamp(0.75rem,1.2vw,0.8rem);
-  color:var(--gray);
-}
-.email-badge {
-  display:inline-flex; align-items:center; gap:8px;
-  background:rgba(201,169,110,0.08);
-  border:1px solid rgba(201,169,110,0.25);
-  border-radius:8px; padding:10px 16px;
-  font-size:clamp(0.78rem,1.3vw,0.85rem);
-  color:var(--gold);
-}
+.form-card{background:rgba(28,21,12,.75);border:1px solid var(--gbord);border-radius:var(--rl);padding:clamp(24px,4vw,38px);backdrop-filter:blur(12px);position:relative;overflow:hidden;}
+.form-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.5;}
+.fc-title{font-family:var(--serif);font-size:clamp(1rem,1.8vw,1.15rem);font-weight:700;margin-bottom:5px;letter-spacing:-.01em;}
+.fc-sub{font-size:.8rem;color:var(--gray);margin-bottom:22px;line-height:1.7;}
+.fc-sub strong{color:var(--gold);font-weight:600;}
+.field{margin-bottom:10px;}
+.field input,.field textarea,.field select{display:block;width:100%;background:rgba(255,255,255,.042);border:1px solid rgba(201,169,110,.18);border-radius:var(--r);padding:13px 16px;color:var(--white);font-family:var(--sans);font-size:.88rem;outline:none;transition:border-color .18s,background .18s;}
+.field textarea{resize:vertical;min-height:88px;}
+.field select option{background:var(--bg2);color:var(--white);}
+.field input::placeholder,.field textarea::placeholder{color:rgba(250,247,242,.24);}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:rgba(201,169,110,.46);background:rgba(255,255,255,.062);}
+.consent-row{display:flex;align-items:flex-start;gap:10px;margin:14px 0 18px;cursor:pointer;}
+.consent-row input[type="checkbox"]{width:15px;height:15px;min-width:15px;margin-top:3px;accent-color:var(--gold);cursor:pointer;}
+.consent-label{font-size:.72rem;color:var(--gray);line-height:1.7;}
+.consent-label a{color:rgba(250,247,242,.4);text-decoration:underline;}
+.fc-note{font-size:.68rem;color:var(--gray);margin-top:10px;line-height:1.7;}
+.done-msg{display:none;text-align:center;padding:16px 0 6px;}
+.done-msg p{font-size:.88rem;color:var(--gray2);line-height:1.8;}
+.btn{display:block;width:100%;background:var(--gold);color:var(--bg4);border:none;border-radius:var(--r);padding:14px 20px;font-family:var(--sans);font-size:clamp(.86rem,1.4vw,.93rem);font-weight:700;cursor:pointer;transition:background .15s,transform .1s;letter-spacing:.01em;word-break:keep-all;white-space:normal;line-height:1.4;text-align:center;}
+.btn:hover{background:var(--gold-h);transform:translateY(-1px);}
+.btn:active{transform:translateY(0);}
+.btn:disabled{background:rgba(201,169,110,.3);cursor:not-allowed;transform:none;}
+.btn-outline{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:transparent;color:var(--gold);border:1px solid rgba(201,169,110,.42);border-radius:var(--r);padding:12px 26px;font-family:var(--sans);font-size:clamp(.86rem,1.4vw,.93rem);font-weight:500;cursor:pointer;transition:all .15s;word-break:keep-all;white-space:normal;line-height:1.4;text-decoration:none;}
+.btn-outline:hover{background:var(--gdim);border-color:var(--gold);}
+.btn-filled{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--gold);color:var(--bg4);border:none;border-radius:var(--r);padding:12px 26px;font-family:var(--sans);font-size:clamp(.86rem,1.4vw,.93rem);font-weight:700;cursor:pointer;transition:background .15s,transform .1s;word-break:keep-all;white-space:normal;line-height:1.4;text-decoration:none;}
+.btn-filled:hover{background:var(--gold-h);transform:translateY(-1px);}
+.prob-sec{background:var(--bg2);border-top:1px solid var(--gbord);border-bottom:1px solid var(--gbord);}
+.prob-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,80px);align-items:start;}
+@media(max-width:760px){.prob-grid{grid-template-columns:1fr;}}
+.loss-cards{display:flex;flex-direction:column;gap:10px;}
+.loss-card{background:rgba(201,169,110,.035);border:1px solid var(--gbord);border-radius:var(--r);padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:border-color .18s;}
+.loss-card:hover{border-color:rgba(201,169,110,.3);}
+.loss-label{font-size:.84rem;color:var(--gray2);line-height:1.45;}
+.loss-num{font-family:var(--serif);font-size:clamp(1rem,1.8vw,1.2rem);font-weight:700;color:var(--gold);white-space:nowrap;flex-shrink:0;}
+.pain-list{display:flex;flex-direction:column;gap:14px;}
+.pain-item{padding:17px 20px;background:rgba(255,255,255,.018);border:1px solid var(--gbord);border-radius:var(--r);border-left:3px solid var(--gold);}
+.pain-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.pain-title{font-size:.9rem;font-weight:700;}
+.pain-pct{font-family:var(--serif);font-size:1.1rem;font-weight:700;color:var(--gold);}
+.pain-desc{font-size:.78rem;color:var(--gray);line-height:1.65;}
+.pain-sol{margin-top:7px;font-size:.74rem;color:var(--ag);font-weight:600;}
+.pain-sol::before{content:'→ ';}
+.proof-strip{border-top:1px solid var(--gbord);border-bottom:1px solid var(--gbord);background:linear-gradient(135deg,rgba(201,169,110,.04),transparent);}
+.ps-grid{display:grid;grid-template-columns:repeat(2,1fr);}
 
-/* ── SNS ── */
-.sns-sec {
-  background:rgba(255,255,255,0.015);
-  border-top:1px solid var(--gold-border);
-  border-bottom:1px solid var(--gold-border);
-  padding:clamp(60px,10vw,110px) clamp(20px,5vw,60px);
-  position:relative; z-index:1;
-}
-.sns-inner {
-  max-width:620px; margin:0 auto; text-align:center;
-}
-.sns-title {
-  font-family:'Playfair Display', serif;
-  font-size:clamp(1.4rem,3vw,2rem);
-  font-weight:700; line-height:1.3;
-  margin-bottom:12px;
-}
-.sns-sub {
-  font-size:clamp(0.85rem,1.5vw,0.95rem);
-  color:var(--gray2); line-height:1.8;
-  margin-bottom:24px;
-}
-.sns-handle {
-  display:block;
-  font-family:'Playfair Display', serif;
-  font-size:clamp(1.2rem,2.5vw,1.6rem);
-  font-weight:700; color:var(--gold);
-  letter-spacing:0.02em; margin-bottom:28px;
-}
-.sns-btns {
-  display:flex; gap:14px;
-  justify-content:center; flex-wrap:wrap;
-}
+.ps-item{padding:clamp(28px,4vw,44px) clamp(16px,2.5vw,32px);border-right:1px solid var(--gbord);text-align:center;}
+.ps-item:last-child{border-right:none;}
 
-/* ── FOOTER ── */
-footer {
-  padding:clamp(28px,4vw,40px) clamp(20px,5vw,60px);
-  display:flex; justify-content:space-between;
-  align-items:center; flex-wrap:wrap; gap:20px;
-  position:relative; z-index:1;
-  border-top:1px solid var(--gold-border);
-}
-.footer-logo {
-  font-family:'Playfair Display', serif;
-  font-size:clamp(1.1rem,2vw,1.3rem);
-  font-weight:900;
-}
-.footer-logo .fi { color:var(--gold); }
-.footer-txt {
-  font-size:clamp(0.68rem,1.1vw,0.75rem);
-  color:var(--gray); line-height:1.9;
-  max-width:500px;
-}
-.footer-txt a { color:var(--gray); text-decoration:underline; }
-
-/* ── MODAL ── */
-.modal-bg {
-  display:none; position:fixed; inset:0;
-  background:rgba(0,0,0,0.75); z-index:300;
-  align-items:center; justify-content:center; padding:20px;
-}
-.modal-bg.on { display:flex; }
-.modal {
-  background:var(--bg2); border:1px solid var(--gold-border);
-  border-radius:16px; padding:clamp(24px,4vw,32px);
-  max-width:460px; width:100%;
-}
-.modal h3 { font-size:1.05rem; margin-bottom:14px; font-weight:700; }
-.modal p { font-size:0.8rem; color:var(--gray); line-height:1.8; margin-bottom:8px; }
-.modal-close {
-  margin-top:18px; background:rgba(255,255,255,0.07);
-  border:none; color:white; padding:9px 22px;
-  border-radius:8px; cursor:pointer;
-  font-family:'Noto Sans KR', sans-serif; font-size:0.83rem;
-}
-
-/* ── ANIMATIONS ── */
-.fade-up {
-  opacity:0; transform:translateY(20px);
-  transition:opacity .6s ease, transform .6s ease;
-}
-.fade-up.visible { opacity:1; transform:translateY(0); }
-
-/* ── SVG ICONS ── */
-.icon-ig { display:inline-block; width:18px; height:18px; vertical-align:middle; }
-.icon-th { display:inline-block; width:18px; height:18px; vertical-align:middle; }
+.ps-num{font-family:var(--serif);font-size:clamp(1.8rem,3.5vw,2.8rem);font-weight:900;color:var(--gold);letter-spacing:-.04em;line-height:1;margin-bottom:8px;}
+.ps-label{font-size:.72rem;color:var(--gray);line-height:1.5;}
+.ps-sub{font-size:.67rem;color:rgba(138,127,110,.6);margin-top:3px;}
+.how-grid{display:grid;grid-template-columns:repeat(4,1fr);}
+@media(max-width:700px){.how-grid{grid-template-columns:1fr 1fr;}}
+@media(max-width:420px){.how-grid{grid-template-columns:1fr;}}
+.how-item{padding:clamp(20px,3vw,34px) clamp(14px,2.2vw,26px);border-right:1px solid var(--gbord);}
+.how-item:last-child{border-right:none;}
+@media(max-width:700px){.how-item:nth-child(2){border-right:none;}.how-item:nth-child(3){border-top:1px solid var(--gbord);border-right:1px solid var(--gbord);}.how-item:nth-child(4){border-top:1px solid var(--gbord);}}
+@media(max-width:420px){.how-item{border-right:none;border-bottom:1px solid var(--gbord);}.how-item:last-child{border-bottom:none;}}
+.how-n{font-family:var(--serif);font-size:clamp(2.8rem,5.5vw,4.5rem);font-weight:900;color:rgba(201,169,110,.12);line-height:1;margin-bottom:14px;text-align:right;}
+.how-line{width:100%;height:1px;background:rgba(201,169,110,.18);margin-bottom:14px;}
+.how-title{font-size:clamp(.83rem,1.4vw,.93rem);font-weight:700;margin-bottom:6px;line-height:1.4;}
+.how-desc{font-size:clamp(.73rem,1.1vw,.8rem);color:var(--gray);line-height:1.7;}
+.how-badge{margin-top:10px;display:inline-block;font-size:.63rem;font-weight:600;letter-spacing:.04em;color:var(--ab);background:rgba(79,195,247,.07);border:1px solid rgba(79,195,247,.2);border-radius:4px;padding:3px 8px;}
+.feat-list{display:flex;flex-direction:column;}
+.feat-item{display:grid;grid-template-columns:1fr auto;align-items:start;gap:clamp(20px,4vw,56px);padding:clamp(26px,4vw,40px) 0;border-bottom:1px solid var(--gbord);}
+.feat-item:first-child{border-top:1px solid var(--gbord);}
+.fi-title{font-family:var(--serif);font-size:clamp(1.05rem,2vw,1.35rem);font-weight:700;margin-bottom:10px;line-height:1.3;}
+.fi-desc{font-size:clamp(.8rem,1.3vw,.88rem);color:var(--gray);line-height:1.9;max-width:580px;}
+.fi-tags{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px;}
+.fi-tag{font-size:.64rem;font-weight:600;letter-spacing:.04em;padding:3px 9px;border-radius:4px;}
+.fi-tag.g{background:rgba(201,169,110,.1);color:var(--gold);border:1px solid rgba(201,169,110,.22);}
+.fi-tag.b{background:rgba(79,195,247,.07);color:var(--ab);border:1px solid rgba(79,195,247,.2);}
+.fi-tag.gr{background:rgba(129,199,132,.07);color:var(--ag);border:1px solid rgba(129,199,132,.2);}
+.fi-num{font-family:var(--serif);font-size:clamp(3rem,6.5vw,5.5rem);font-weight:900;color:rgba(201,169,110,.12);line-height:1;text-align:right;min-width:clamp(58px,7.5vw,96px);padding-top:4px;}
+.try-banner{background:linear-gradient(135deg,rgba(201,169,110,.07),rgba(201,169,110,.03));border:1px solid rgba(201,169,110,.22);border-radius:var(--rl);padding:clamp(20px,3vw,32px) clamp(20px,3vw,36px);display:flex;gap:clamp(16px,3vw,32px);align-items:flex-start;flex-wrap:wrap;margin-top:clamp(40px,6vw,64px);}
+.tb-icon{font-size:2rem;flex-shrink:0;margin-top:2px;}
+.tb-title{font-family:var(--serif);font-size:clamp(1rem,1.8vw,1.2rem);font-weight:700;margin-bottom:8px;letter-spacing:-.01em;}
+.tb-desc{font-size:clamp(.78rem,1.25vw,.86rem);color:var(--gray);line-height:1.85;}
+.tb-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.tb-tag{font-size:.67rem;font-weight:600;letter-spacing:.04em;padding:4px 10px;border-radius:20px;background:rgba(201,169,110,.1);color:var(--gold);border:1px solid rgba(201,169,110,.2);}
+.seller-sec{background:var(--bg2);border-top:1px solid var(--gbord);border-bottom:1px solid var(--gbord);}
+.seller-grid{display:grid;grid-template-columns:1fr 1fr;gap:clamp(40px,6vw,88px);align-items:start;}
+@media(max-width:860px){.seller-grid{grid-template-columns:1fr;}}
+.seller-h2{font-family:var(--serif);font-size:clamp(1.6rem,3.2vw,2.4rem);font-weight:700;line-height:1.18;letter-spacing:-.025em;margin-bottom:14px;}
+.seller-h2 em{font-style:normal;color:var(--gold);}
+.seller-desc{font-size:clamp(.82rem,1.35vw,.9rem);color:var(--gray);line-height:1.95;margin-bottom:28px;}
+.sc-list{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;}
+.sc{background:rgba(201,169,110,.03);border:1px solid var(--gbord);border-radius:var(--r);padding:14px 18px;display:flex;gap:14px;align-items:flex-start;transition:border-color .18s;}
+.sc:hover{border-color:rgba(201,169,110,.32);}
+.sc-icon{font-size:1.4rem;flex-shrink:0;margin-top:1px;}
+.sc-title{font-size:.88rem;font-weight:700;margin-bottom:3px;}
+.sc-desc{font-size:.76rem;color:var(--gray);line-height:1.6;}
+.sc-new{display:inline-block;font-size:.58rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;background:rgba(201,169,110,.12);color:var(--gold);border:1px solid rgba(201,169,110,.24);padding:2px 7px;border-radius:3px;margin-left:6px;vertical-align:middle;}
+.email-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(201,169,110,.07);border:1px solid rgba(201,169,110,.22);border-radius:8px;padding:10px 16px;font-size:clamp(.76rem,1.2vw,.84rem);color:var(--gold);text-decoration:none;}
+.ptype-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}@media(max-width:600px){.ptype-grid{grid-template-columns:1fr;}}
+.ptype-item{background:rgba(201,169,110,.03);border:1px solid var(--gbord);border-radius:var(--r);padding:20px 22px;transition:border-color .18s;}
+.ptype-item:hover{border-color:rgba(201,169,110,.3);}
+.pt-title{font-size:clamp(.88rem,1.4vw,.95rem);font-weight:700;margin-bottom:6px;}
+.pt-desc{font-size:clamp(.78rem,1.2vw,.84rem);color:var(--gray);line-height:1.65;}
+.demo-strip{background:var(--bg2);border-top:1px solid var(--gbord);border-bottom:1px solid var(--gbord);}
+.demo-inner{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;padding:clamp(28px,4vw,40px) 0;}
+.demo-h3{font-family:var(--serif);font-size:clamp(1rem,1.8vw,1.2rem);font-weight:700;margin-bottom:6px;letter-spacing:-.015em;}
+.demo-desc{font-size:.8rem;color:var(--gray);line-height:1.7;}
+.sns-wrap{background:rgba(255,255,255,.01);border-top:1px solid var(--gbord);border-bottom:1px solid var(--gbord);}
+.sns-inner{max-width:640px;margin:0 auto;padding:clamp(64px,10vw,100px) clamp(20px,5vw,40px);text-align:center;}
+.sns-h2{font-family:var(--serif);font-size:clamp(1.4rem,2.8vw,1.9rem);font-weight:700;line-height:1.25;margin-bottom:12px;letter-spacing:-.02em;}
+.sns-sub{font-size:clamp(.83rem,1.4vw,.93rem);color:var(--gray2);line-height:1.85;margin-bottom:22px;}
+.sns-handle{display:block;font-family:var(--serif);font-size:clamp(1.1rem,2.2vw,1.5rem);font-weight:700;color:var(--gold);letter-spacing:.02em;margin-bottom:28px;}
+.sns-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;}
+.si{width:17px;height:17px;vertical-align:middle;}
+footer{padding:clamp(28px,4vw,42px) clamp(20px,5vw,64px);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:20px;position:relative;z-index:1;border-top:1px solid var(--gbord);}
+.fl{font-family:var(--serif);font-size:clamp(1.1rem,1.9vw,1.3rem);font-weight:900;}
+.fl .fi{color:var(--gold);}
+.ft{font-size:clamp(.65rem,1vw,.73rem);color:var(--gray);line-height:2;max-width:520px;text-align:right;}
+.ft a{color:var(--gray);text-decoration:underline;}
+@media(max-width:640px){.ft{text-align:left;}}
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:300;align-items:center;justify-content:center;padding:20px;}
+.modal-bg.on{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--gbord);border-radius:var(--rl);padding:clamp(22px,4vw,32px);max-width:460px;width:100%;}
+.modal h3{font-size:1rem;margin-bottom:14px;font-weight:700;}
+.modal p{font-size:.78rem;color:var(--gray);line-height:1.85;margin-bottom:7px;}
+.modal-close{margin-top:18px;background:rgba(255,255,255,.06);border:none;color:var(--white);padding:9px 22px;border-radius:8px;cursor:pointer;font-family:var(--sans);font-size:.82rem;transition:background .15s;}
+.modal-close:hover{background:rgba(255,255,255,.1);}
+.fu{opacity:0;transform:translateY(18px);transition:opacity .55s ease,transform .55s ease;}
+.fu.vis{opacity:1;transform:translateY(0);}
 </style>
 </head>
 <body>
-
-<!-- NAV -->
+<div class="glow-r"></div><div class="glow-l"></div>
 <nav>
   <div class="nav-logo"><span class="fi">Fi</span>tory</div>
-  <div class="nav-badge">사전 오픈 신청 중</div>
+  <div class="nav-r">
+    <span class="nav-pill">Coming Soon · 2026</span>
+  </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
-  <div>
-    <div class="hero-tag">Coming Soon · 2026</div>
-    <h1 class="hero-h1">
-      동네 기반<br>
-      <em>실시간 클라우드 옷장</em>
-    </h1>
-    <p class="hero-sub">
-      동네 거점에서 <strong>3분 만에 픽업.</strong><br>
-      정찰제로 투명하게, <strong>3,000원부터.</strong><br>
-      출퇴근길에 빌리고, 반납하고, 수익을 만드세요.</strong><br>
-      </strong><br>
-      *사전 오픈 신청 업체 한정 우대 혜택 제공!!*
-    </p>
-  </div>
-
-  <div class="form-card">
-    <div class="form-card-title">사전 오픈 신청</div>
-    <div class="form-card-sub">오픈 시 가장 먼저 알려드립니다.<br>신청자에게 오픈 초기 혜택이 제공될 예정이에요.</div>
-    <div id="fa1">
-      <div class="field"><input type="text" id="n1" placeholder="이름 또는 닉네임" maxlength="20"></div>
-      <div class="field"><input type="tel" id="p1" placeholder="010-0000-0000" maxlength="13"></div>
-      <label class="consent-row">
-        <input type="checkbox" id="c1">
-        <span class="consent-label">개인정보 수집·이용에 동의합니다. 수집: 이름·연락처 / 목적: 오픈 안내 / 보유: 오픈 후 즉시 파기. <a href="#" onclick="openM(event)">자세히</a></span>
-      </label>
-      <button class="btn" type="button" onclick="doSignup(this)">오픈 알림 신청하기</button>
-      <p class="form-note">* 현재 개발 중인 서비스입니다. 개인정보는 오픈 안내 외 사용되지 않습니다.</p>
-    </div>
-    <div class="done-msg" id="ok1"><p><strong>신청 완료! 🎉</strong><br>Fitory 오픈 시 가장 먼저 연락드릴게요 😊</p></div>
-  </div>
-</section>
-
-<!-- FEATURES -->
-<section class="sec sec-divider">
-  <div class="sec-label">Why Fitory</div>
-  <h2 class="sec-title">옷 대여, 기존 대안이 해결 못한<br>세 가지를 동시에</h2>
-  <div class="feature-list">
-    <div class="feature-item fade-up">
-      <div class="feature-item-left">
-        <div class="feature-item-title">3분 만에, 오늘 바로</div>
-        <div class="feature-item-desc">빠르고 쉽게 빌려요. 배송은 언제? Fitory는 출퇴근길 동네 거점에서 QR 하나로 지금 당장 픽업! 오늘 입을 옷을 오늘 빌리세요.</div>
-      </div>
-      <div class="feature-num">01</div>
-    </div>
-    <div class="feature-item fade-up">
-      <div class="feature-item-left">
-        <div class="feature-item-title">3,000원부터, 정찰제</div>
-        <div class="feature-item-desc">최저가 3,000원. 카테고리별 정찰제로 투명하게. 일반 의류는 수수료 없어요. 공급자 대여료 전액 지급. 고가·명품 일부 카테고리만 수수료 적용.</div>
-      </div>
-      <div class="feature-num">02</div>
-    </div>
-    <div class="feature-item fade-up">
-      <div class="feature-item-left">
-        <div class="feature-item-title">잠든 옷이 돈이 된다</div>
-        <div class="feature-item-desc">옷장을 등록하면 대여료가 쌓여요. 내 옷이 일하게 만드세요. 가방, 악세사리 등 무한 확장 예정!</div>
-      </div>
-      <div class="feature-num">03</div>
-    </div>
-  </div>
-</section>
-
-<!-- HOW -->
-<section class="sec sec-divider">
-  <div class="sec-label">How it works</div>
-  <h2 class="sec-title">딱 4단계예요</h2>
-  <div class="steps-grid">
-    <div class="step-item fade-up">
-      <div class="step-num">01</div>
-      <div class="step-line"></div>
-      <div class="step-title">앱에서 옷 선택</div>
-      <div class="step-desc">AI 코디 추천도 받아보세요.</div>
-    </div>
-    <div class="step-item fade-up">
-      <div class="step-num">02</div>
-      <div class="step-line"></div>
-      <div class="step-title">보관함 QR 픽업</div>
-      <div class="step-desc">출근길, 3분이면 충분.</div>
-    </div>
-    <div class="step-item fade-up">
-      <div class="step-num">03</div>
-      <div class="step-line"></div>
-      <div class="step-title">오늘의 코디 완성</div>
-      <div class="step-desc">원하는 스타일로, 3,000원부터.</div>
-    </div>
-    <div class="step-item fade-up">
-      <div class="step-num">04</div>
-      <div class="step-line"></div>
-      <div class="step-title">사진 찍고 반납</div>
-      <div class="step-desc">포인트 적립까지.</div>
-    </div>
-  </div>
-</section>
-
-<section class="sec sec-divider">
-  <div class="sec-label">For Sellers</div>
-  <h2 class="sec-title">
-    사장님, 재고를 쌓아두지 말고<br>
-    수익으로 돌리세요
-  </h2>
-
-  <div class="feature-list">
-
-    <div class="feature-item">
-      <div class="feature-item-left">
-        <div class="feature-item-title">1분 등록, 바로 시작</div>
-        <div class="feature-item-desc">
-          사진 + 가격만 등록하면 끝. 복잡한 쇼핑몰 세팅 없이 바로 대여 시작.
-        </div>
-      </div>
-      <div class="feature-num">01</div>
-    </div>
-
-    <div class="feature-item">
-      <div class="feature-item-left">
-        <div class="feature-item-title">입어보는 쇼룸 효과</div>
-        <div class="feature-item-desc">
-          위치 기반으로 근처의 고객과 자연스럽게 연결됩니다. 
-          직접 입어본 경험이 구매까지! 온라인보다 강한 체험 기반 유입을 만듭니다.
-        </div>
-      </div>
-      <div class="feature-num">02</div>
-    </div>
-
-    <div class="feature-item">
-      <div class="feature-item-left">
-        <div class="feature-item-title">편안한 리뷰 관리</div>
-        <div class="feature-item-desc">
-          이용 경험이 기록되고, 다음 선택으로 이어집니다. 신뢰가 자연스럽게 만들어집니다.
-        </div>
-      </div>
-      <div class="feature-num">03
-      </div>
-    </div>
-
-    <div class="feature-item">
-      <div class="feature-item-left">
-        <div class="feature-item-title">방문이 자연스럽게 매장을 알립니다.</div>
-        <div class="feature-item-desc">
-          매장 픽업 기능으로 자연스러운 방문 흐름을 만들어 보세요!
-        </div>
-      </div>
-      <div class="feature-num">04</div>
-    </div>
-
-  </div>
-</section>
-
-<!-- PARTNERSHIP -->
-<section class="sec sec-divider">
-  <div class="sec-label">Partnership</div>
-  <div class="partner-grid">
+<section style="position:relative;z-index:1;">
+  <div class="hero">
     <div>
-      <h2 class="partner-title">오프라인 거점 기반<br>실시간 클라우드 옷장</h2>
-      <p class="partner-desc">Fitory는 물류 없는 즉시 대여 구조, 유휴 자산 수익화, 지역 거점 확장 기반의 새로운 의류 공유 모델을 만들었습니다!</strong><br> 
-        </strong><br>
-        새로운 문화를 선도하며, 함께 혁신적인 가치를 실현해 나가실 대표님들을 찾습니다!</p>
-      <div class="ptype-list">
-        <div class="ptype-item fade-up">
-          <div class="ptype-title">거점 공간 제공</div>
-          <div class="ptype-desc">코인세탁방, 무인카페, 아파트 등</div>
-        </div>
-        <div class="ptype-item fade-up">
-          <div class="ptype-title">의류 소매업체 입점</div>
-          <div class="ptype-desc">구제샵·편집샵·소규모 브랜드</div>
-        </div>
-        <div class="ptype-item fade-up">
-          <div class="ptype-title">보관함 제작·공급</div>
-          <div class="ptype-desc">IoT 스마트 보관함 제조사</div>
-        </div>
-        <div class="ptype-item fade-up">
-          <div class="ptype-title">투자 및 사업 협력</div>
-          <div class="ptype-desc">엔젤·액셀러레이터·멘토링 환영</div>
-        </div>
+      <div class="eyebrow"><span class="ed"></span>AI 패션 O2O 플랫폼 · Fitory</div>
+      <h1 class="hero-h1">지금 당장,<br><span class="g">동네에서,</span><br>저렴하게<span class="sub">소유에서 경험으로.<br>잠든 옷장을 깨우다.</span></h1>
+      <p class="hero-body">AI가 TPO·날씨·취향으로 <strong>코디 셋업을 통째로 추천</strong>하고,<br>소비자는 <strong>전체 구매·단품 구매·입어보기(대여)</strong> 중 선택한다.<br>배송 없이, 오늘 바로, <strong>우리 동네 매장에서 픽업.</strong></p>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:28px;">
+        <div style="height:1px;flex:1;background:var(--gbord);"></div>
+        <span style="font-size:.68rem;color:var(--gray);letter-spacing:.14em;text-transform:uppercase;white-space:nowrap;">잠든 옷장에 이자가 쌓인다</span>
+        <div style="height:1px;flex:1;background:var(--gbord);"></div>
       </div>
-      <div class="email-badge">dudn4291@naver.com</div>
+      <div class="hero-proof">
+        <div class="proof-item"><span class="proof-num">62.7%</span><span class="proof-label">입을 옷 없는 상황<br>일상적으로 경험</span></div>
+        
+        <div class="proof-item"><span class="proof-num">3,765억</span><span class="proof-label">연간 패션 소비<br>구조적 손실 규모</span></div>
+      </div>
+      
     </div>
-
-    <div class="form-card fade-up">
-      <div class="form-card-title">파트너십 문의</div>
-      <div class="form-card-sub">아래 양식으로 보내주시면 빠르게 답변드릴게요.</div>
-      <div id="fa2">
-        <div class="field"><input type="text" id="n2" placeholder="이름 / 회사명" maxlength="40"></div>
-        <div class="field"><input type="tel" id="p2" placeholder="010-0000-0000" maxlength="13"></div>
+    <div class="form-card" id="signup">
+      <div class="fc-title">사전 오픈 신청</div>
+      <div class="fc-sub">신청자에게 <strong>초기 우대 혜택</strong>이 제공될 예정이에요.<br>오픈 시 가장 먼저 알려드립니다.</div>
+      <div id="fa1">
+        <div class="field"><input type="text" id="n1" placeholder="이름 또는 닉네임" maxlength="20"></div>
+        <div class="field"><input type="tel" id="p1" placeholder="010-0000-0000" maxlength="13"></div>
         <div class="field">
-          <select id="t2">
-            <option value="" disabled selected>문의 유형 선택</option>
-            <option>거점 공간 제공</option>
-            <option>의류 소매업체 입점</option>
-            <option>보관함 제작·공급</option>
-            <option>투자 및 사업 협력</option>
-            <option>기타</option>
+          <select id="r1">
+            <option value="" disabled selected>신청 유형 선택</option>
+            <option>수요자 (옷 빌리고 싶어요)</option>
+            <option>소매업체 / 매장 입점 희망</option>
+            <option>개인 공급자 (옷 빌려주고 싶어요)</option>
+            <option>거점 공간 제공 (코인세탁방 등)</option>
           </select>
         </div>
-        <div class="field"><textarea id="m2" placeholder="문의 내용을 자유롭게 적어주세요."></textarea></div>
-        <button class="btn" type="button" onclick="doPartner(this)">문의 보내기</button>
-        <p class="form-note">* 입력하신 정보는 파트너십 문의 답변 목적으로만 사용됩니다.</p>
+        <label class="consent-row">
+          <input type="checkbox" id="c1" onchange="toggleSignupBtn()">
+          <span class="consent-label">개인정보 수집·이용에 동의합니다. 수집: 이름·연락처 / 목적: 오픈 안내 / 보유: 오픈 후 즉시 파기. <a href="#" onclick="openM(event)">자세히</a></span>
+        </label>
+        <button class="btn" type="button" id="signup-btn" onclick="doSignup(this)" disabled style="background:rgba(201,169,110,.25);color:rgba(201,169,110,.4);cursor:not-allowed;">오픈 알림 신청하기</button>
+        <p class="fc-note">* 단골 멤버십·피팅권 등 락인 혜택은 사전 신청자에게 우선 제공 예정이에요.</p>
       </div>
-      <div class="done-msg" id="ok2"><p><strong>문의 감사합니다! ✅</strong><br>빠른 시일 내에 답변드릴게요.</p></div>
+      <div class="done-msg" id="ok1"><p><strong>신청 완료! 🎉</strong><br>Fitory 오픈 시 가장 먼저 연락드릴게요 😊</p></div>
     </div>
   </div>
 </section>
 
-<!-- SNS -->
-<div class="sns-sec">
+<section class="sec prob-sec">
+  <div class="sec-inner">
+    <div class="prob-grid">
+      <div class="fu">
+        <div class="eyebrow"><span class="ed"></span>Problem</div>
+        <h2 class="sec-h2" style="margin-bottom:28px;">패션 소비의 <em>구조적 낭비</em>,<br>연간 3,765억 원</h2>
+        <p style="font-size:.88rem;color:var(--gray2);line-height:1.9;margin-bottom:24px;">옷장은 터져나가지만 입을 옷은 없는 아이러니. 소유 중심 소비 구조가 소비자, 소상공인, 환경 모두에 손실을 누적시키고 있습니다.</p>
+        <div class="loss-cards">
+          <div class="loss-card"><span class="loss-label">소비자 유휴 의류<br><small style="color:var(--gray3);">20대 의류 지출 중 저활용 21%</small></span><span class="loss-num">연 2,940억</span></div>
+          <div class="loss-card"><span class="loss-label">이커머스 워드로빙<br><small style="color:var(--gray3);">반품률 20~30%, 역물류·재고비용</small></span><span class="loss-num">연 500억+</span></div>
+          <div class="loss-card"><span class="loss-label">의류 폐기물<br><small style="color:var(--gray3);">연 10.8만 톤 처리·환경 비용</small></span><span class="loss-num">연 325억+</span></div>
+          <div class="loss-card" style="border-color:rgba(201,169,110,.28);"><span class="loss-label" style="color:var(--white);">오프라인 소매점 3년 생존율<br><small style="color:var(--gray3);">서울시 상권분석서비스, 2023</small></span><span class="loss-num">45.3%</span></div>
+        </div>
+      </div>
+      <div class="fu">
+        <div class="eyebrow" style="visibility:hidden;">–</div>
+        <h2 class="sec-h2" style="margin-bottom:24px;">소비자가 겪는<br><em>3가지 핵심 결핍</em></h2>
+        <p style="font-size:.76rem;color:var(--gray);margin-bottom:20px;">자체 설문 N=118 기반</p>
+        <div class="pain-list">
+          <div class="pain-item"><div class="pain-head"><span class="pain-title">공간 압박</span><span class="pain-pct">65.1%</span></div><div class="pain-desc">1인 가구 수납 한계. 옷은 많은데 더 살 공간도, 버릴 용기도 없다.</div><div class="pain-sol">동네 기반 클라우드 옷장(O2O)으로 해결</div></div>
+          <div class="pain-item"><div class="pain-head"><span class="pain-title">코디 갈증</span><span class="pain-pct">32.6%</span></div><div class="pain-desc">스타일링 역량·정보 부족. 뭘 사야 할지 모른 채 지갑만 열다 후회한다.</div><div class="pain-sol">AI 셋업 추천 + 매장 코디 연계</div></div>
+          <div class="pain-item"><div class="pain-head"><span class="pain-title">비용 부담</span><span class="pain-pct">30.2%</span></div><div class="pain-desc">하객룩·면접복·데이트룩… 1회성 고가 의류를 사야만 하는 구조.</div><div class="pain-sol">저비용 대여 → 확신 생기면 구매 전환</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="proof-strip" style="position:relative;z-index:1;">
+  <div class="sec-inner" style="padding-top:0;padding-bottom:0;">
+    <div class="ps-grid">
+      <div class="ps-item fu"><div class="ps-num">N=118</div><div class="ps-label">자체 수요 설문</div><div class="ps-sub">20대 80%+ · 남녀 모두 검증</div></div>
+      
+      
+      <div class="ps-item fu"><div class="ps-num">53.2%</div><div class="ps-label">남성 이용 의향</div><div class="ps-sub">소개팅·면접·아메카지 수요</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec divider">
+  <div class="sec-inner">
+    <div class="eyebrow"><span class="ed"></span>How it works</div>
+    <h2 class="sec-h2">AI가 코디하고,<br>동네에서 바로 <em>입는다</em></h2>
+    <div class="how-grid">
+      <div class="how-item fu"><div class="how-n">01</div><div class="how-line"></div><div class="how-title">AI 코디 셋업 추천</div><div class="how-desc">TPO·날씨·취향 입력. AI가 상의·하의·아우터·액세서리를 완성형 셋업으로 묶어 제안.</div><span class="how-badge">AI 자동 태깅</span></div>
+      <div class="how-item fu"><div class="how-n">02</div><div class="how-line"></div><div class="how-title">구매·대여 선택</div><div class="how-desc">마음에 들면 전체 구매, 일단 입어보고 싶다면 대여(피팅권). 확신이 생기면 구매로 전환.</div><span class="how-badge">Try &amp; Buy</span></div>
+      <div class="how-item fu"><div class="how-n">03</div><div class="how-line"></div><div class="how-title">동네 매장 당일 픽업</div><div class="how-desc">앱 예약·결제 후 근처 파트너 매장에서 오늘 바로 수령. 배송 0일, 물류센터 0원.</div><span class="how-badge">배송 없음 · 당일 즉시</span></div>
+      <div class="how-item fu"><div class="how-n">04</div><div class="how-line"></div><div class="how-title">반납 &amp; 적립</div><div class="how-desc">반납 사진 1장으로 완료. 가결제 자동 정산, 포인트 적립. 단골 혜택 우선 제공.</div><span class="how-badge">가결제 자동 정산</span></div>
+    </div>
+    <div class="try-banner fu">
+      <div class="tb-icon">👗</div>
+      <div style="flex:1;">
+        <div class="tb-title">피팅권으로 먼저 입어보고, 확신이 생기면 구매</div>
+        <div class="tb-desc">'사야만 한다'는 벽에 가로막혀 포기하던 경험, 이제 없애드릴게요. Fitory는 대여를 구매의 반대가 아닌 <strong style="color:var(--white);">고품질 브랜드를 경험하는 입구</strong>로 만듭니다. 입어보고 확신이 생겼을 때 구매로 이어지는 선순환 구조, 패션 산업 전체의 파이를 키웁니다.</div>
+        <div class="tb-tags"><span class="tb-tag">피팅권 우선 제공</span><span class="tb-tag">단골 멤버십 (예정)</span><span class="tb-tag">구매 전환 할인</span><span class="tb-tag">환불 정책 명확화</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec divider">
+  <div class="sec-inner">
+    <div class="eyebrow"><span class="ed"></span>Why Fitory · 수요자</div>
+    <h2 class="sec-h2">기존 대안이 해결 못 한<br><em>세 가지</em>를 동시에</h2>
+    <div class="feat-list">
+      <div class="feat-item fu"><div><div class="fi-title">당일 즉시 — 배송 1~3일의 벽을 깬다</div><div class="fi-desc">오늘 소개팅인데 옷이 없다. 내일 면접인데 정장이 없다. Fitory는 앱에서 예약하고 출근길에 근처 매장에서 바로 픽업. 배송 기다릴 필요 없이 지금 당장 해결된다.</div><div class="fi-tags"><span class="fi-tag g">동네 매장 픽업</span><span class="fi-tag b">물류비 0</span></div></div><div class="fi-num">01</div></div>
+      <div class="feat-item fu"><div><div class="fi-title">코디 셋업 — 단품이 아닌 완성형 룩</div><div class="fi-desc">상의만 빌려서는 아무 의미 없다. AI가 상황·날씨·취향을 분석해 상의+하의+아우터+액세서리를 셋업으로 묶어 추천. '이 코디 통째로 빌리기' 한 번으로 오늘의 룩이 완성된다.<br><small style="color:var(--gray);font-size:.75rem;margin-top:6px;display:block;">* 단품 구매도 가능 / 대여는 코디 셋업 단위로 운영</small></div><div class="fi-tags"><span class="fi-tag g">AI 코디 추천</span><span class="fi-tag g">셋업 묶음 대여</span></div></div><div class="fi-num">02</div></div>
+      <div class="feat-item fu"><div><div class="fi-title">남녀 모두 — 블루오션 남성 수요</div><div class="fi-desc">기존 대여 서비스는 사실상 여성 전용. Fitory는 소개팅·면접·아메카지 셋업을 원하는 남성 수요까지 흡수한다. 자체 설문에서 남성 응답자 53.2%가 이용 의향을 밝혔다.</div><div class="fi-tags"><span class="fi-tag b">남성 블루오션</span><span class="fi-tag g">소개팅·면접 특화</span></div></div><div class="fi-num">03</div></div>
+      <div class="feat-item fu"><div><div class="fi-title">안심 거래 — 분쟁 없는 자동 정산</div><div class="fi-desc">법학 전공 지식으로 설계한 투명한 보상 체계. 가결제 자동 청구, 반납 사진 의무화, 소액보험 연계. 위생·훼손 우려로 머뭇거리던 58.8%의 진입 장벽을 완전히 없앤다.</div><div class="fi-tags"><span class="fi-tag gr">가결제 자동 정산</span><span class="fi-tag gr">소액보험 연계</span><span class="fi-tag b">세탁 완료 인증</span></div></div><div class="fi-num">04</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec seller-sec">
+  <div class="sec-inner">
+    <div class="eyebrow"><span class="ed"></span>For Sellers · 소상공인·매장</div>
+    <div class="seller-grid">
+      <div class="fu">
+        <h2 class="seller-h2">재고는 쌓이는데<br>손님은 줄어드는 <em>악순환</em>,<br>Fitory가 끊습니다</h2>
+        <p class="seller-desc">동네 의류 소매점 3년 생존율은 45.3%. 온라인 플랫폼에 빼앗긴 수요를 되찾을 무기가 필요합니다. Fitory는 추가 비용 없이 유휴 재고를 디지털화하고, 앱 유저의 발길을 직접 매장으로 이끕니다.</p>
+        <div class="sc-list">
+          <div class="sc"><div class="sc-icon">📸</div><div><div class="sc-title">1분 등록, AI가 알아서<span class="sc-new">AI</span></div><div class="sc-desc">사진 1장 업로드 → AI가 카테고리·설명·추천 가격 자동 세팅. 복잡한 세팅 없이 바로 시작.</div></div></div>
+          <div class="sc"><div class="sc-icon">🗺</div><div><div class="sc-title">패션 특화 로컬 맵<span class="sc-new">신규</span></div><div class="sc-desc">기존 지도 서비스 최초 패션 장르 필터링. 빈티지·여성복·남성복 스타일 태그로 취향 기반 탐색.</div></div></div>
+          <div class="sc"><div class="sc-icon">🛍</div><div><div class="sc-title">쇼룸 효과 → 구매 전환</div><div class="sc-desc">피팅권 대여로 매장에 직접 방문한 고객이 구매까지. 온라인보다 강한 체험 기반 유입.</div></div></div>
+          <div class="sc"><div class="sc-icon">📊</div><div><div class="sc-title">파트너 센터 (웹 대시보드)<span class="sc-new">전용</span></div><div class="sc-desc">엑셀 일괄 업로드, 코디 묶음 구성, 재고·정산 현황 한눈에. B2B 전용 PC 웹 대시보드.</div></div></div>
+          <div class="sc"><div class="sc-icon">💰</div><div><div class="sc-title">투명한 수수료 구조</div><div class="sc-desc">판매 수수료 15~20%, 대여 수수료 10%. 사전 입점 파트너에게 온보딩 우대 수수료 적용 예정.</div></div></div>
+        </div>
+        <a href="mailto:dudn4291@naver.com" class="email-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>dudn4291@naver.com</a>
+      </div>
+      <div class="form-card fu">
+        <div class="fc-title">파트너십 문의</div>
+        <div class="fc-sub">아래 양식으로 보내주시면 <strong>빠르게 답변</strong>드릴게요.</div>
+        <div id="fa2">
+          <div class="field"><input type="text" id="n2" placeholder="이름 / 회사명 / 매장명" maxlength="40"></div>
+          <div class="field"><input type="tel" id="p2" placeholder="010-0000-0000" maxlength="13"></div>
+          <div class="field"><select id="t2"><option value="" disabled selected>문의 유형 선택</option><option>의류 소매업체 입점 (B2B 파트너)</option><option>거점 공간 제공 (코인세탁방·무인카페 등)</option><option>보관함 제작·공급</option><option>투자 및 사업 협력</option><option>기타</option></select></div>
+          <div class="field"><textarea id="m2" placeholder="문의 내용을 자유롭게 적어주세요. 매장 규모, 보유 재고 종류 등을 간략히 적어주시면 빠른 안내가 가능해요."></textarea></div>
+          <button class="btn" type="button" onclick="doPartner(this)">문의 보내기</button>
+          <p class="fc-note">* 입력하신 정보는 파트너십 문의 답변 목적으로만 사용됩니다.</p>
+        </div>
+        <div class="done-msg" id="ok2"><p><strong>문의 감사합니다! ✅</strong><br>빠른 시일 내에 답변드릴게요.</p></div>
+      </div>
+    </div>
+    <div style="margin-top:clamp(48px,7vw,80px);">
+      <h3 style="font-family:var(--serif);font-size:clamp(1.2rem,2.2vw,1.6rem);font-weight:700;letter-spacing:-.02em;margin-bottom:24px;">함께 만들어갈 파트너를 찾습니다</h3>
+      <div class="ptype-grid">
+        <div class="ptype-item fu"><div class="pt-title">🏪 의류 소매업체 입점</div><div class="pt-desc">구제샵·편집샵·소규모 브랜드. 유휴 재고 수익화 + 신규 고객 유입.</div></div>
+        <div class="ptype-item fu"><div class="pt-title">🏠 거점 공간 제공</div><div class="pt-desc">코인세탁방·무인카페·아파트 공용 공간. 유휴 공간으로 새 수익원.</div></div>
+        <div class="ptype-item fu"><div class="pt-title">📦 보관함 제작·공급</div><div class="pt-desc">IoT 스마트 보관함 제조사·개발사. Phase 2 무인 거점 확장 파트너.</div></div>
+        <div class="ptype-item fu"><div class="pt-title">💡 투자 및 사업 협력</div><div class="pt-desc">엔젤·액셀러레이터·멘토링. 3,765억 구조적 손실 해결하는 팀과 함께.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<section style="position:relative;z-index:1;border-top:1px solid var(--gbord);border-bottom:1px solid var(--gbord);">
+  <div class="sec-inner" style="padding:clamp(52px,8vw,88px) 0;">
+    <div style="max-width:680px;margin:0 auto;text-align:center;">
+      <div class="eyebrow" style="justify-content:center;"><span class="ed"></span>App Preview · 내부 프리뷰</div>
+      <h2 style="font-family:var(--serif);font-size:clamp(1.5rem,3vw,2.1rem);font-weight:700;line-height:1.2;letter-spacing:-.025em;margin-bottom:14px;">아직 공개 전이지만,<br><em style="font-style:normal;color:var(--gold);">이미 움직이고 있습니다</em></h2>
+      <p style="font-size:clamp(.84rem,1.4vw,.94rem);color:var(--gray2);line-height:1.9;margin-bottom:32px;">AI 코디 추천 · 지도 탐색 · 대여 예약 · 공급자 플로우까지<br>MVP 앱 프로토타입이 완성됐습니다.<br>파트너십·투자 문의자에게 개별적으로 공유드립니다.</p>
+      <div id="preview-form-wrap">
+        <div style="display:flex;flex-direction:column;gap:10px;max-width:420px;margin:0 auto;">
+          <input type="text" id="pv-name" placeholder="이름 / 회사명" style="background:rgba(255,255,255,.042);border:1px solid rgba(201,169,110,.18);border-radius:var(--r);padding:13px 16px;color:var(--white);font-family:var(--sans);font-size:.88rem;outline:none;transition:border-color .18s;">
+          <input type="tel" id="pv-phone" placeholder="010-0000-0000" style="background:rgba(255,255,255,.042);border:1px solid rgba(201,169,110,.18);border-radius:var(--r);padding:13px 16px;color:var(--white);font-family:var(--sans);font-size:.88rem;outline:none;transition:border-color .18s;">
+          <button onclick="doPreview(this)" style="background:transparent;border:1px solid rgba(201,169,110,.45);border-radius:var(--r);padding:13px 20px;color:var(--gold);font-family:var(--sans);font-size:.9rem;font-weight:600;cursor:pointer;transition:all .15s;letter-spacing:.01em;" onmouseover="this.style.background='rgba(201,169,110,.1)'" onmouseout="this.style.background='transparent'">프리뷰 링크 신청하기</button>
+          <p style="font-size:.67rem;color:var(--gray);line-height:1.65;">* 확인 후 개별 연락드립니다. 외부 공개 링크가 아닌 내부 접근 링크를 공유해드려요.</p>
+        </div>
+      </div>
+      <div id="preview-done" style="display:none;padding:20px 0;"><p style="font-size:.92rem;color:var(--gray2);">신청 완료 ✅<br>확인 후 빠르게 연락드릴게요.</p></div>
+    </div>
+  </div>
+</section>
+<div class="sns-wrap" style="position:relative;z-index:1;">
   <div class="sns-inner">
-    <div class="sec-label" style="text-align:center;">Follow us</div>
-    <h2 class="sns-title">Fitory가 세상을 바꾸는 과정,<br>인스타그램에서 가장 먼저 확인하세요</h2>
-    <p class="sns-sub">창업 스토리부터 서비스 오픈까지.<br>모든 순간을 함께하고 싶어요.</p>
+    <div class="eyebrow" style="justify-content:center;"><span class="ed"></span>Follow us</div>
+    <h2 class="sns-h2">창업 스토리부터 오픈까지,<br>인스타그램에서 가장 먼저</h2>
+    <p class="sns-sub">Fitory가 세상을 바꾸는 과정을 함께해요.<br>모든 순간을 가장 가까이에서 공유합니다.</p>
     <span class="sns-handle">@Fitory__official__</span>
     <div class="sns-btns">
-      <a href="https://www.instagram.com/fitory__official__/" target="_blank" class="btn-filled">
-        <svg class="icon-ig" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect x="2" y="2" width="20" height="20" rx="5" stroke="#1c1610" stroke-width="2"/>
-          <circle cx="12" cy="12" r="4" stroke="#1c1610" stroke-width="2"/>
-          <circle cx="17.5" cy="6.5" r="1" fill="#1c1610"/>
-        </svg>
-        인스타그램 팔로우
-      </a>
-      <a href="https://www.threads.net/@fitory__official__" target="_blank" class="btn-outline">
-        <svg class="icon-th" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.5 8.5c-.5-2.5-3.5-3-5-1.5-1 1-1 3 0 4s3 1.5 4 0" stroke="#c9a96e" stroke-width="1.8" stroke-linecap="round"/>
-          <path d="M12 8v8M9.5 13.5c.8 1.5 2.5 2 4 1.5" stroke="#c9a96e" stroke-width="1.8" stroke-linecap="round"/>
-        </svg>
-        Threads 팔로우
-      </a>
+      <a href="https://www.instagram.com/fitory__official__/" target="_blank" class="btn-filled"><svg class="si" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="#111009" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="#111009" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1" fill="#111009"/></svg>인스타그램 팔로우</a>
+      <a href="https://www.threads.net/@fitory__official__" target="_blank" class="btn-outline"><svg class="si" viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm3.5 8.5c-.5-2.5-3.5-3-5-1.5-1 1-1 3 0 4s3 1.5 4 0" stroke="#c9a96e" stroke-width="1.8" stroke-linecap="round"/><path d="M12 8v8M9.5 13.5c.8 1.5 2.5 2 4 1.5" stroke="#c9a96e" stroke-width="1.8" stroke-linecap="round"/></svg>Threads 팔로우</a>
     </div>
   </div>
 </div>
 
-<!-- FOOTER -->
 <footer>
-  <div class="footer-logo"><span class="fi">Fi</span>tory</div>
-  <div class="footer-txt">
-    © 2026 Fitory. 현재 개발 중인 서비스입니다.<br>
-    개인정보: 수집(이름·연락처) / 목적(오픈안내·파트너십 문의) / 보유(목적달성 후 즉시파기) / 제3자 제공 없음<br>
-    <a href="mailto:dudn4291@naver.com">dudn4291@naver.com</a>
-  </div>
+  <div class="fl"><span class="fi">Fi</span>tory</div>
+  <div class="ft">© 2026 Fitory. 현재 개발 중인 서비스입니다.<br>개인정보: 수집(이름·연락처) / 목적(오픈안내·파트너십 문의) / 보유(목적달성 후 즉시파기) / 제3자 제공 없음<br><a href="mailto:dudn4291@naver.com">dudn4291@naver.com</a></div>
 </footer>
 
-<!-- 개인정보 모달 -->
 <div class="modal-bg" id="mb">
-  <div class="modal">
-    <h3>개인정보 수집·이용 안내</h3>
-    <p><strong>수집 항목:</strong> 이름(닉네임), 연락처</p>
-    <p><strong>수집 목적:</strong> 서비스 오픈 안내 및 초기 혜택 제공</p>
-    <p><strong>보유 기간:</strong> 오픈 안내 완료 후 즉시 파기</p>
-    <p><strong>제3자 제공:</strong> 없음</p>
-    <p style="font-size:0.73rem;color:rgba(138,127,110,0.65)">본 서비스는 현재 개발 중이며 출시 일정은 변경될 수 있습니다.</p>
-    <button class="modal-close" onclick="closeM()">확인</button>
-  </div>
+  <div class="modal"><h3>개인정보 수집·이용 안내</h3><p><strong>수집 항목:</strong> 이름(닉네임), 연락처</p><p><strong>수집 목적:</strong> 서비스 오픈 안내 및 초기 혜택 제공</p><p><strong>보유 기간:</strong> 오픈 안내 완료 후 즉시 파기</p><p><strong>제3자 제공:</strong> 없음</p><p style="font-size:.72rem;color:rgba(138,127,110,.6)">본 서비스는 현재 개발 중이며 출시 일정은 변경될 수 있습니다.</p><button class="modal-close" onclick="closeM()">확인</button></div>
 </div>
 
 <script>
-// 모달
+
+function toggleSignupBtn(){
+  const cb=document.getElementById('c1');
+  const btn=document.getElementById('signup-btn');
+  if(cb.checked){
+    btn.disabled=false;
+    btn.style.background='';
+    btn.style.color='';
+    btn.style.cursor='';
+  } else {
+    btn.disabled=true;
+    btn.style.background='rgba(201,169,110,.25)';
+    btn.style.color='rgba(201,169,110,.4)';
+    btn.style.cursor='not-allowed';
+  }
+}
 function openM(e){e.preventDefault();document.getElementById('mb').classList.add('on');}
 function closeM(){document.getElementById('mb').classList.remove('on');}
 document.getElementById('mb').addEventListener('click',function(e){if(e.target===this)closeM();});
-
-// 전화번호 포맷
-function fmtPhone(el){
-  let v=el.value.replace(/\D/g,'');
-  if(v.length>=7) v=v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7,11);
-  else if(v.length>=4) v=v.slice(0,3)+'-'+v.slice(3);
-  el.value=v;
-}
+function fmtPhone(el){let v=el.value.replace(/\D/g,'');if(v.length>=7)v=v.slice(0,3)+'-'+v.slice(3,7)+'-'+v.slice(7,11);else if(v.length>=4)v=v.slice(0,3)+'-'+v.slice(3);el.value=v;}
 document.getElementById('p1').addEventListener('input',function(){fmtPhone(this);});
 document.getElementById('p2').addEventListener('input',function(){fmtPhone(this);});
-
-// 사전 신청
 async function doSignup(btn){
-  const n=document.getElementById('n1').value.trim();
-  const p=document.getElementById('p1').value.trim();
-  const c=document.getElementById('c1').checked;
+  const n=document.getElementById('n1').value.trim(),p=document.getElementById('p1').value.trim(),r=document.getElementById('r1').value,c=document.getElementById('c1').checked;
   if(!n){alert('이름을 입력해주세요.');return;}
   if(p.replace(/\D/g,'').length<10){alert('연락처를 올바르게 입력해주세요.');return;}
+  if(!r){alert('신청 유형을 선택해주세요.');return;}
   if(!c){alert('개인정보 수집·이용에 동의해주세요.');return;}
-  btn.disabled=true; btn.textContent='신청 중...';
+  btn.disabled=true;btn.textContent='신청 중...';
   try{
-    const r=await fetch('https://formspree.io/f/xreyrkzn',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body:JSON.stringify({이름:n,연락처:p,유형:'사전오픈신청'})
-    });
-    if(r.ok){
-      document.getElementById('fa1').style.display='none';
-      document.getElementById('ok1').style.display='block';
-    } else {
-      alert('오류가 발생했습니다. 다시 시도해주세요.');
-      btn.disabled=false; btn.textContent='오픈 알림 신청하기';
-    }
-  } catch(e){
-    alert('네트워크 오류입니다. 다시 시도해주세요.');
-    btn.disabled=false; btn.textContent='오픈 알림 신청하기';
-  }
+    const res=await fetch('https://formspree.io/f/xreyrkzn',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({이름:n,연락처:p,유형:'사전오픈신청',신청유형:r})});
+    if(res.ok){document.getElementById('fa1').style.display='none';document.getElementById('ok1').style.display='block';}
+    else{alert('오류가 발생했습니다. 다시 시도해주세요.');btn.disabled=false;btn.textContent='오픈 알림 신청하기';}
+  }catch(e){alert('네트워크 오류입니다. 다시 시도해주세요.');btn.disabled=false;btn.textContent='오픈 알림 신청하기';}
 }
-
-// 파트너십 문의
 async function doPartner(btn){
-  const n=document.getElementById('n2').value.trim();
-  const p=document.getElementById('p2').value.trim();
-  const t=document.getElementById('t2').value;
-  const m=document.getElementById('m2').value.trim();
+  const n=document.getElementById('n2').value.trim(),p=document.getElementById('p2').value.trim(),t=document.getElementById('t2').value,m=document.getElementById('m2').value.trim();
   if(!n){alert('이름 또는 회사명을 입력해주세요.');return;}
   if(p.replace(/\D/g,'').length<10){alert('연락처를 올바르게 입력해주세요.');return;}
   if(!t){alert('문의 유형을 선택해주세요.');return;}
   if(!m){alert('문의 내용을 입력해주세요.');return;}
-  btn.disabled=true; btn.textContent='전송 중...';
+  btn.disabled=true;btn.textContent='전송 중...';
   try{
-    const r=await fetch('https://formspree.io/f/xreyrkzn',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Accept':'application/json'},
-      body:JSON.stringify({이름:n,연락처:p,문의유형:t,내용:m,유형:'파트너십문의'})
-    });
-    if(r.ok){
-      document.getElementById('fa2').style.display='none';
-      document.getElementById('ok2').style.display='block';
-    } else {
-      alert('오류가 발생했습니다. 다시 시도해주세요.');
-      btn.disabled=false; btn.textContent='문의 보내기';
-    }
-  } catch(e){
-    alert('네트워크 오류입니다. 다시 시도해주세요.');
-    btn.disabled=false; btn.textContent='문의 보내기';
-  }
+    const res=await fetch('https://formspree.io/f/xreyrkzn',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({이름:n,연락처:p,문의유형:t,내용:m,유형:'파트너십문의'})});
+    if(res.ok){document.getElementById('fa2').style.display='none';document.getElementById('ok2').style.display='block';}
+    else{alert('오류가 발생했습니다. 다시 시도해주세요.');btn.disabled=false;btn.textContent='문의 보내기';}
+  }catch(e){alert('네트워크 오류입니다. 다시 시도해주세요.');btn.disabled=false;btn.textContent='문의 보내기';}
 }
 
-// 스크롤 애니메이션
-const obs=new IntersectionObserver(es=>{
-  es.forEach(e=>{if(e.isIntersecting) e.target.classList.add('visible');});
-},{threshold:0.08});
-document.querySelectorAll('.fade-up').forEach(el=>obs.observe(el));
+async function doPreview(btn){
+  const n=document.getElementById('pv-name').value.trim();
+  const p=document.getElementById('pv-phone').value.trim();
+  if(!n){alert('이름을 입력해주세요.');return;}
+  if(p.replace(/\D/g,'').length<10){alert('연락처를 올바르게 입력해주세요.');return;}
+  btn.disabled=true;btn.textContent='신청 중...';
+  try{
+    const res=await fetch('https://formspree.io/f/xreyrkzn',{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify({이름:n,연락처:p,유형:'앱프리뷰신청'})});
+    if(res.ok){document.getElementById('preview-form-wrap').style.display='none';document.getElementById('preview-done').style.display='block';}
+    else{alert('오류가 발생했습니다.');btn.disabled=false;btn.textContent='프리뷰 링크 신청하기';}
+  }catch(e){alert('네트워크 오류입니다.');btn.disabled=false;btn.textContent='프리뷰 링크 신청하기';}
+}
+document.getElementById('pv-phone').addEventListener('input',function(){fmtPhone(this);});
+
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('vis');});},{threshold:0.07,rootMargin:'0px 0px -36px 0px'});
+document.querySelectorAll('.fu').forEach(el=>obs.observe(el));
 </script>
 </body>
 </html>
